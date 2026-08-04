@@ -29,6 +29,11 @@
       --font-display: Georgia, "Times New Roman", serif;
     }
 
+    html[lang="zh-Hant"] {
+      --font-ui: -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      --font-display: "Songti TC", "Noto Serif TC", "PMingLiU", serif;
+    }
+
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body {
@@ -97,6 +102,9 @@
     .button:hover { transform: translateY(-1px); border-color: #aebbc9; background: #f8fafc; }
     .button.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
     .button svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+    .language-switch { display: inline-flex; padding: 3px; background: #f3f6f9; border: 1px solid var(--line); border-radius: 10px; }
+    .language-switch button { min-width: 42px; height: 34px; padding: 0 9px; color: var(--muted); background: transparent; border: 0; border-radius: 7px; cursor: pointer; font-size: 11px; font-weight: 850; }
+    .language-switch button.active { color: #fff; background: var(--ink); box-shadow: 0 2px 6px rgba(16, 36, 62, .14); }
     .last-updated { padding-left: 13px; margin-left: 4px; border-left: 1px solid var(--line); color: var(--muted); font-size: 12px; }
 
     .subnav {
@@ -306,6 +314,8 @@
     UPDATE GUIDE
     This page is intentionally a single file. Update trip facts in the HTML rows below.
     Search for "DATA: flights", "DATA: stays", "DATA: agenda" and "DATA: actions".
+    For every new English sentence, add its Traditional Chinese translation in ZH_TRANSLATIONS.
+    The language switch remembers each visitor's choice in this browser.
     Personal notes and checklist choices are stored only in the current browser via localStorage.
   -->
   <div class="shell">
@@ -315,6 +325,10 @@
         <p>10 September — 11 October 2026 · James’s share-safe trip board</p>
       </div>
       <div class="header-actions">
+        <div class="language-switch" role="group" aria-label="Language" data-no-translate>
+          <button id="languageEnglish" type="button" aria-pressed="true">EN</button>
+          <button id="languageChinese" type="button" aria-pressed="false">中文</button>
+        </div>
         <button class="button primary" id="shareButton" type="button" aria-label="Share this dashboard">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-4M8.6 13.5l6.8 4"/></svg>
           <span class="wide-label">Share</span>
@@ -345,7 +359,7 @@
               <h2>Nine stops, three distinct phases</h2>
               <p>Company travel through Bilbao, followed by a personal Spain extension and return via Hong Kong.</p>
             </div>
-            <div class="countdown" aria-live="polite">
+            <div class="countdown" aria-live="polite" data-no-translate>
               <strong id="countdownNumber">—</strong>
               <span id="countdownLabel">to departure</span>
             </div>
@@ -518,7 +532,7 @@
           <div class="panel notes-card">
             <h3>Private notes on this device</h3>
             <textarea id="tripNotes" maxlength="3000" placeholder="Add room numbers, meeting points or coordination notes here. Avoid storing passport or credit-card details."></textarea>
-            <div class="autosave"><span id="saveState">Saved locally</span><span><span id="noteCount">0</span> / 3000</span></div>
+            <div class="autosave"><span id="saveState" data-no-translate>Saved locally</span><span><span id="noteCount">0</span> / 3000</span></div>
             <div class="checklist" id="checklist">
               <h3>Next actions</h3>
               <label><input type="checkbox" data-key="tickets"><span>Receive and review every e-ticket receipt; confirm names, dates and baggage.</span></label>
@@ -554,28 +568,335 @@
 
   <script>
     (() => {
+      /*
+        BILINGUAL UPDATE DATA
+        Keep the English fact in the HTML above, then add the same full English text here
+        with its Traditional Chinese translation. Exact matches switch automatically.
+      */
+      const ZH_TRANSLATIONS = Object.freeze({
+        "Montreal · Detroit · Spain — Trip Board": "蒙特婁 · 底特律 · 西班牙 — 旅程看板",
+        "Share-safe trip dashboard for Montreal, Detroit, Bilbao and Barcelona in 2026.": "2026 年蒙特婁、底特律、畢爾包與巴塞隆納安全分享旅程看板。",
+        "Montreal · Detroit · Spain": "蒙特婁 · 底特律 · 西班牙",
+        "Montreal · Detroit · Spain · 2026": "蒙特婁 · 底特律 · 西班牙 · 2026",
+        "10 September — 11 October 2026 · James’s share-safe trip board": "2026 年 9 月 10 日 — 10 月 11 日 · James 的安全分享旅程看板",
+        "Language": "語言",
+        "Share this dashboard": "分享此旅程看板",
+        "Print this dashboard": "列印此旅程看板",
+        "Share": "分享",
+        "Print": "列印",
+        "Conversation reviewed · 4 Aug 2026": "對話整理日期 · 2026 年 8 月 4 日",
+        "Dashboard sections": "旅程看板區段",
+        "Overview": "概覽",
+        "Flights": "航班",
+        "Stays & ground": "住宿與交通",
+        "Day-by-day": "逐日行程",
+        "Notes & sources": "筆記與來源",
+        "Trip overview": "旅程概覽",
+        "Journey overview": "旅程總覽",
+        "Nine stops, three distinct phases": "九個停靠點，三個旅程階段",
+        "Company travel through Bilbao, followed by a personal Spain extension and return via Hong Kong.": "公務行程至畢爾包，之後延伸西班牙私人行程，並經香港返台。",
+        "to departure": "距離出發",
+        "day to departure": "天後出發",
+        "days to departure": "天後出發",
+        "In progress": "旅程進行中",
+        "trip underway": "正在旅途中",
+        "Complete": "旅程已結束",
+        "trip dates passed": "行程日期已過",
+        "Scrollable route overview": "可水平捲動的旅程路線",
+        "Taipei": "台北",
+        "Tokyo": "東京",
+        "Montreal": "蒙特婁",
+        "Detroit": "底特律",
+        "Frankfurt": "法蘭克福",
+        "Bilbao": "畢爾包",
+        "Barcelona": "巴塞隆納",
+        "Hong Kong": "香港",
+        "Kaohsiung": "高雄",
+        "10 Sep": "9 月 10 日",
+        "13 Sep": "9 月 13 日",
+        "19 Sep": "9 月 19 日",
+        "Date TBD": "日期待定",
+        "11 Oct": "10 月 11 日",
+        "Current stage: ticketing & hotels": "目前階段：開票與住宿",
+        "Flights are selected; ticket receipts and accommodation confirmations are still needed.": "航班已選定；仍需取得電子機票與住宿確認。",
+        "Route phase legend": "旅程階段圖例",
+        "Company": "公務",
+        "Private": "私人",
+        "Return": "返程",
+        "Needs attention": "待處理事項",
+        "Verify tickets were issued": "確認機票已開立",
+        "Celine’s latest ticketing deadline was 4 Aug at 15:00 Taipei time.": "Celine 提供的最新開票期限為 8 月 4 日台北時間 15:00。",
+        "Urgent": "緊急",
+        "Confirm Montreal hotel": "確認蒙特婁住宿",
+        "City-centre corporate option, or Days Inn fallback.": "優先選擇市中心企業價住宿，否則採用 Days Inn 備案。",
+        "Fix myCWT profile access": "處理 myCWT 帳戶存取",
+        "Email mismatch blocks the credit-card hotel guarantee.": "電子郵件不相符，導致無法用信用卡擔保住宿。",
+        "Reserve Westin / conference block": "預訂 Westin／大會住房",
+        "The venue is known; the room booking is not confirmed in the thread.": "會場已確認，但對話中尚未找到客房確認。",
+        "Verify": "待確認",
+        "Select an industry tour": "選擇產業參訪",
+        "RSVP is required; UL NAABL is limited to 20 people.": "必須事先 RSVP；UL NAABL 名額上限為 20 人。",
+        "Add Bilbao details": "補上畢爾包資訊",
+        "Hotel, office address, final work dates and BIO→BCN plan.": "住宿、辦公地址、最終工作日期與 BIO→BCN 安排。",
+        "Open": "待補",
+        "Verify KHH as final airport": "確認最終抵達機場為 KHH",
+        "Celine’s quote heading said Taoyuan, while the actual itinerary showed Kaohsiung.": "Celine 報價標題寫桃園，但實際行程顯示高雄。",
+        "Selected flights": "已選航班",
+        "Times are local. “Approved” means James approved the option with Celine; it does not replace an e-ticket receipt.": "時間皆為當地時間。「已同意」表示 James 已向 Celine 同意此選項，但不等同於已收到電子機票。",
+        "Date": "日期",
+        "From": "出發",
+        "To": "抵達",
+        "Local time": "當地時間",
+        "Flight": "航班",
+        "Cabin": "艙等",
+        "Baggage": "行李",
+        "Status": "狀態",
+        "Thu · 10 Sep": "週四 · 9 月 10 日",
+        "Sun · 13 Sep": "週日 · 9 月 13 日",
+        "Fri · 18 Sep": "週五 · 9 月 18 日",
+        "Sat · 19 Sep": "週六 · 9 月 19 日",
+        "Sat · 10 Oct": "週六 · 10 月 10 日",
+        "Sun · 11 Oct": "週日 · 10 月 11 日",
+        "Taipei · Terminal 2": "台北 · 第 2 航廈",
+        "Tokyo · Terminal 2": "東京 · 第 2 航廈",
+        "Tokyo · Terminal 1": "東京 · 第 1 航廈",
+        "Frankfurt · Terminal 1": "法蘭克福 · 第 1 航廈",
+        "Barcelona · Terminal 2": "巴塞隆納 · 第 2 航廈",
+        "Hong Kong · Terminal 1": "香港 · 第 1 航廈",
+        "3h 30m": "3 小時 30 分",
+        "12h 10m · same date": "12 小時 10 分 · 同日抵達",
+        "1h 59m": "1 小時 59 分",
+        "7h 45m": "7 小時 45 分",
+        "2h 10m": "2 小時 10 分",
+        "12h": "12 小時",
+        "1h 35m": "1 小時 35 分",
+        "Japan Airlines": "日本航空",
+        "Air Canada": "加拿大航空",
+        "Lufthansa": "漢莎航空",
+        "Cathay Pacific": "國泰航空",
+        "Economy S": "經濟艙 S",
+        "Economy B": "經濟艙 B",
+        "Premium Economy A": "豪華經濟艙 A",
+        "Approved": "已同意",
+        "Ticket check": "確認開票",
+        "Airport check": "確認機場",
+        "○ The 10 October departure is intentional in Celine’s latest quote. It arrives in Kaohsiung on 11 October. Keep the actual e-ticket as the final authority.": "○ Celine 最新報價中的 10 月 10 日出發日期是正確的，並於 10 月 11 日抵達高雄。請以實際電子機票為最終依據。",
+        "Stays & ground transport": "住宿與地面交通",
+        "Known addresses and practical transfers, with booking status kept explicit.": "整理已知地址與實用交通方式，並清楚標示預訂狀態。",
+        "10–13 Sep · 3 nights": "9 月 10–13 日 · 3 晚",
+        "Decision:": "決定：",
+        "ask Celine for a suitable city-centre corporate-rate hotel. If none fits policy, book the Days Inn fallback.": "請 Celine 尋找合適的市中心企業價住宿；若沒有符合政策的選項，則預訂 Days Inn 備案。",
+        "Fallback quote in the conversation: CAD 570.73 estimated total, including mandatory taxes/fees; continental breakfast listed. Live transit should be checked before each outing.": "對話中的備案報價估計總額為 CAD 570.73，已含必要稅費，並列有歐陸式早餐。每次外出前請即時查詢交通。",
+        "Official hotel ↗": "飯店官網 ↗",
+        "Map ↗": "地圖 ↗",
+        "To Old Montreal ↗": "前往蒙特婁老城 ↗",
+        "Awaiting Celine": "等待 Celine",
+        "Detroit / Southfield": "底特律／Southfield",
+        "13–18 Sep": "9 月 13–18 日",
+        "Conference venue and intended hotel:": "大會會場與預計住宿：",
+        "The Westin Southfield Detroit. The Travel conversation does not yet contain a room confirmation.": "The Westin Southfield Detroit。Travel 專案對話中尚未找到客房確認。",
+        "Arrive DTW at 21:29 on 13 Sep. The hotel is 22 miles from DTW and does not run an airport shuttle. Use an official rideshare, taxi or pre-booked MetroCars; the hotel lists MetroCars at USD 59 one-way.": "9 月 13 日 21:29 抵達 DTW。飯店距機場 22 英里且無接駁車；請使用官方叫車、計程車或預約 MetroCars。飯店列出的 MetroCars 單程價格為 USD 59。",
+        "Airport route ↗": "機場路線 ↗",
+        "Room not confirmed": "客房未確認",
+        "19 Sep onward": "9 月 19 日起",
+        "Ask Celine for a city-centre or worksite-convenient corporate hotel. The work address, hotel, end date and reimbursement benchmark are not confirmed in the recovered conversation.": "請 Celine 尋找市中心或方便前往工作地點的企業價住宿。目前對話中尚未確認工作地址、住宿、結束日期與費用基準。",
+        "Bilbao map ↗": "畢爾包地圖 ↗",
+        "after Bilbao → 10 Oct": "畢爾包之後 → 10 月 10 日",
+        "BIO→BCN and the Barcelona stay are self-arranged. Add the travel date, property and contact plan when chosen.": "BIO→BCN 與巴塞隆納住宿為自行安排。確定後補上日期、住宿與聯絡方案。",
+        "Open Google Flights ↗": "開啟 Google Flights ↗",
+        "Self-arranged": "自行安排",
+        "Conversation decision log": "對話決策紀錄",
+        "Montreal:": "蒙特婁：",
+        "Baymont rejected. DoubleTree and Sheraton had no UL contract rate through CWT. Days Inn is the low-friction fallback.": "已排除 Baymont。DoubleTree 與 Sheraton 透過 CWT 無 UL 合約價；Days Inn 是最直接的備案。",
+        "Hotel blocker:": "住宿阻礙：",
+        "myCWT could not match James’s email, so the profile/credit-card guarantee could not be updated.": "myCWT 無法比對 James 的電子郵件，因此無法更新個人資料與信用卡擔保。",
+        "Detroit arrival:": "底特律抵達：",
+        "go directly from DTW to Southfield by car; avoid a long late-night public-transit journey with luggage.": "由 DTW 直接搭車前往 Southfield，避免深夜攜帶行李搭乘耗時的大眾運輸。",
+        "Accounting:": "費用處理：",
+        "trip marked Non-Billable. BIO→Taiwan remains the company-return benchmark; private extension details need final policy handling.": "旅程標記為 Non-Billable。BIO→台灣仍是公司返程費用基準；私人延伸行程需依最終政策處理。",
+        "Privacy:": "隱私：",
+        "ticket numbers, booking references, phone numbers and personal email addresses are intentionally excluded here.": "此頁刻意排除票號、訂位代碼、電話號碼與私人電子郵件。",
+        "Dismissed / older options": "已排除／較早選項",
+        "Los Angeles and Tokyo/Delta routings were rejected in favor of Montreal.": "已排除洛杉磯與東京／達美路線，改採蒙特婁方案。",
+        "Premium Economy DTW→FRA was rejected because the quoted personal fare difference was disproportionate.": "因個人需支付的價差過高，已排除 DTW→FRA 豪華經濟艙。",
+        "The 17 Sep Detroit departure was moved to 18 Sep so the industry tour can be attended.": "底特律出發日由 9 月 17 日改為 18 日，以便參加產業參訪。",
+        "Global Transportation and Power Systems Summit · 14–16 Sep; industry tours · 17 Sep.": "全球運輸與動力系統高峰會 · 9 月 14–16 日；產業參訪 · 9 月 17 日。",
+        "The Westin": "The Westin",
+        "Southfield Detroit": "Southfield Detroit",
+        "Conference venue and intended stay. The property is in Southfield, not downtown Detroit and not the similarly named Westin inside DTW airport.": "大會會場與預計住宿地點。飯店位於 Southfield，並非底特律市中心，也不是 DTW 機場內名稱相近的 Westin。",
+        "Conference site ↗": "大會官網 ↗",
+        "Official schedule ↗": "官方議程 ↗",
+        "14–16 Sep": "9 月 14–16 日",
+        "Conference": "大會",
+        "RSVP-only tours": "需 RSVP 的參訪",
+        "Eastern Time": "美東時間",
+        "All event times": "所有活動時間",
+        "22 miles": "22 英里",
+        "From DTW": "距 DTW",
+        "Monday": "星期一",
+        "Tuesday": "星期二",
+        "Wednesday": "星期三",
+        "Thursday": "星期四",
+        "Arrival rhythm & conference opening": "抵達調整與大會開幕",
+        "Registration 13:00–18:00. Welcome reception and technical poster session 17:30–19:00. Use the morning to recover, work and prepare.": "報到時間 13:00–18:00；歡迎酒會與技術海報場次 17:30–19:00。上午用於休息、工作與準備。",
+        "Full conference day": "大會全天議程",
+        "Registration from 07:00; keynote, technical sessions, networking and the evening honors/awards program. Check the live technical-session schedule for your priority talks.": "07:00 起報到；包含專題演講、技術場次、交流與晚間表揚／頒獎活動。請依即時議程確認優先參加的場次。",
+        "Keynote, technical sessions and panels, including future powertrain development and scaling ADAS/autonomous mobility.": "包含專題演講、技術場次與論壇，主題涵蓋未來動力系統開發及 ADAS／自動駕駛規模化。",
+        "Select one industry tour · transportation from hotel provided": "選擇一項產業參訪 · 飯店提供交通",
+        "RSVP required. Tour times include travel.": "必須 RSVP。所列時間包含交通。",
+        "09:15 · 4h · Auburn Hills · capacity 20 · NDA + lunch": "09:15 · 4 小時 · Auburn Hills · 20 人 · NDA＋午餐",
+        "08:30 · 3h · Ann Arbor · capacity 40": "08:30 · 3 小時 · Ann Arbor · 40 人",
+        "09:00 · 1.5h · Pontiac · capacity 60": "09:00 · 1.5 小時 · Pontiac · 60 人",
+        "Official tour details & RSVP ↗": "官方參訪資訊與 RSVP ↗",
+        "A working rhythm for the whole trip. Specific Bilbao and Barcelona days stay open until new information arrives.": "整體旅程的工作節奏；畢爾包與巴塞隆納的詳細日期待新資訊補上。",
+        "Thu": "週四",
+        "Fri": "週五",
+        "Sat": "週六",
+        "Sun": "週日",
+        "Mon": "週一",
+        "Tue": "週二",
+        "Wed": "週三",
+        "Week": "週",
+        "TBD": "待定",
+        "Sat–Sun": "週六–週日",
+        "11 Sep": "9 月 11 日",
+        "12 Sep": "9 月 12 日",
+        "14 Sep": "9 月 14 日",
+        "15 Sep": "9 月 15 日",
+        "16 Sep": "9 月 16 日",
+        "17 Sep": "9 月 17 日",
+        "18 Sep": "9 月 18 日",
+        "20 Sep": "9 月 20 日",
+        "21 Sep+": "9 月 21 日起",
+        "Late Sep": "9 月下旬",
+        "10–11 Oct": "10 月 10–11 日",
+        "Taipei → Tokyo → Montreal": "台北 → 東京 → 蒙特婁",
+        "Arrive YUL 17:00. Clear formalities, get to the hotel, eat and protect sleep.": "17:00 抵達 YUL。完成入境程序、前往住宿、用餐並優先補眠。",
+        "Montreal buffer day": "蒙特婁緩衝日",
+        "Light work / city time. Confirm hotel-to-airport plan and keep the evening easy.": "安排輕量工作／城市活動，確認住宿到機場的交通，晚上放鬆。",
+        "Cost treatment": "費用處理",
+        "Montreal day": "蒙特婁行程",
+        "Flexible city day. Pack and check AC8583 status in the evening.": "彈性城市行程；晚上整理行李並確認 AC8583 航班狀態。",
+        "Montreal → Detroit": "蒙特婁 → 底特律",
+        "19:30 flight. Allow extra time for U.S. pre-clearance. After 21:29 arrival, take a car directly to Westin Southfield.": "19:30 起飛。美國預先通關需預留更多時間；21:29 抵達後直接搭車前往 Westin Southfield。",
+        "Conference opening": "大會開幕",
+        "Morning recovery/prep; registration 13:00; welcome reception 17:30.": "上午休息與準備；13:00 報到；17:30 歡迎酒會。",
+        "ASME DRIVN · full day": "ASME DRIVN · 全天議程",
+        "Prioritize battery safety, electrification, hybrid mobility and networking.": "優先關注電池安全、電動化、混合動力與交流活動。",
+        "Keynotes, technical sessions and panels. Confirm tour meeting point before sleep.": "參加專題演講、技術場次與論壇；睡前確認參訪集合地點。",
+        "Industry tour": "產業參訪",
+        "Select and RSVP. Return to hotel, reorganize luggage and prepare for Europe.": "選定並完成 RSVP；返回飯店後整理行李並準備前往歐洲。",
+        "Detroit → Frankfurt": "底特律 → 法蘭克福",
+        "Hotel checkout by 12:00. LH443 departs 16:00.": "12:00 前退房；LH443 於 16:00 起飛。",
+        "Frankfurt → Bilbao": "法蘭克福 → 畢爾包",
+        "Arrive BIO 13:00. Check in, eat and recover.": "13:00 抵達 BIO；辦理入住、用餐並休息。",
+        "Bilbao reset day": "畢爾包調整日",
+        "Prepare for the work week; confirm office route and meeting plan.": "準備工作週，確認辦公地點路線與會議安排。",
+        "Details open": "細節待補",
+        "Bilbao business": "畢爾包公務",
+        "Add the worksite address, meeting owners and confirmed end date.": "補上工作地點、會議負責人與確認的結束日期。",
+        "Bilbao → Barcelona": "畢爾包 → 巴塞隆納",
+        "Self-arranged; choose date, flight/train and baggage plan.": "自行安排日期、航班／火車與行李方案。",
+        "Barcelona → Hong Kong → Kaohsiung": "巴塞隆納 → 香港 → 高雄",
+        "13:00 departure; 10:10 arrival next day. Verify the e-ticket says KHH.": "13:00 出發，隔日 10:10 抵達。確認電子機票目的地為 KHH。",
+        "Notes, checklist & sources": "筆記、清單與來源",
+        "Notes and checked items save only in this browser; they are not sent anywhere and do not change the shared webpage.": "筆記與勾選項目只儲存在此瀏覽器，不會傳送或改變分享中的網頁。",
+        "Private notes on this device": "此裝置上的私人筆記",
+        "Add room numbers, meeting points or coordination notes here. Avoid storing passport or credit-card details.": "可在此記錄房號、集合地點或協調事項。請勿儲存護照或信用卡資料。",
+        "Saved locally": "已儲存於本機",
+        "Saving…": "儲存中…",
+        "Local save unavailable": "無法使用本機儲存",
+        "Next actions": "後續行動",
+        "Receive and review every e-ticket receipt; confirm names, dates and baggage.": "收取並檢查所有電子機票，確認姓名、日期與行李額度。",
+        "Resolve myCWT profile and confirm the Montreal hotel.": "處理 myCWT 個人資料並確認蒙特婁住宿。",
+        "Confirm Westin Southfield room and late-arrival note.": "確認 Westin Southfield 客房及晚到備註。",
+        "Register for ASME DRIVN and RSVP for one industry tour.": "完成 ASME DRIVN 報名，並選擇一項產業參訪 RSVP。",
+        "Add Bilbao hotel, work address, contacts and meeting dates.": "補上畢爾包住宿、工作地址、聯絡資訊與會議日期。",
+        "Book BIO→BCN and Barcelona stay.": "預訂 BIO→BCN 與巴塞隆納住宿。",
+        "Check passport, U.S. ESTA, Canada eTA, insurance and company approvals.": "檢查護照、美國 ESTA、加拿大 eTA、保險與公司核准。",
+        "Source hierarchy": "資料來源優先順序",
+        "Celine / CWT conversation summary": "Celine／CWT 對話摘要",
+        "Source of selected flight times, cabin classes, baggage and booking decisions. Final e-tickets override this page.": "已選航班時間、艙等、行李與預訂決策的來源；最終以電子機票為準。",
+        "ASME DRIVN 2026 official site ↗": "ASME DRIVN 2026 官網 ↗",
+        "Venue, conference dates, registration and live program.": "會場、大會日期、報名與即時議程。",
+        "ASME schedule at a glance ↗": "ASME 議程總覽 ↗",
+        "Daily event rhythm and Eastern Time schedule.": "每日活動節奏與美東時間議程。",
+        "ASME industry tours ↗": "ASME 產業參訪 ↗",
+        "Tour start times, capacity, locations and RSVP details.": "參訪開始時間、名額、地點與 RSVP 資訊。",
+        "Westin Southfield official site ↗": "Westin Southfield 官網 ↗",
+        "Address, check-in/out, DTW distance and ground-transport information.": "地址、入住／退房、距 DTW 距離與地面交通資訊。",
+        "Days Inn Montreal official site ↗": "Days Inn Montreal 官網 ↗",
+        "Fallback address and current property information.": "備案地址與目前飯店資訊。",
+        "Share-safe by design.": "依安全分享原則設計。",
+        "This copy excludes booking references, ticket numbers, payment data, private email addresses and personal phone numbers. Do not add those before publishing publicly.": "此版本不含訂位代碼、票號、付款資料、私人電子郵件與個人電話。公開發布前請勿加入這些資訊。",
+        "Built from the Travel-project conversation with Celine; verify all bookings against issued confirmations.": "內容整理自 Travel 專案中與 Celine 的對話；所有預訂請以正式確認文件為準。",
+        "Montreal · Detroit · Spain trip board": "蒙特婁 · 底特律 · 西班牙旅程看板",
+        "Dashboard link copied.": "已複製旅程看板連結。",
+        "This is a local file. Publish it before sharing a link.": "這是本機檔案；發布後才能分享連結。",
+        "Could not share from this browser.": "此瀏覽器無法分享。"
+      });
+
+      let currentLanguage = 'en';
+      const originalTextNodes = new WeakMap();
+      const originalAttributes = new WeakMap();
+      const translatedAttributes = ['aria-label', 'placeholder', 'title'];
+
+      const uiText = english => currentLanguage === 'zh-Hant' ? (ZH_TRANSLATIONS[english] || english) : english;
+
+      const captureAndTranslate = language => {
+        document.querySelectorAll('body *:not(script):not(style)').forEach(element => {
+          if (element.closest('[data-no-translate]')) return;
+          element.childNodes.forEach(node => {
+            if (node.nodeType !== 3 || !node.nodeValue.trim()) return;
+            if (!originalTextNodes.has(node)) originalTextNodes.set(node, node.nodeValue);
+            const original = originalTextNodes.get(node);
+            const key = original.trim();
+            const replacement = language === 'zh-Hant' ? (ZH_TRANSLATIONS[key] || key) : key;
+            const leading = original.match(/^\s*/)[0];
+            const trailing = original.match(/\s*$/)[0];
+            node.nodeValue = leading + replacement + trailing;
+          });
+
+          let stored = originalAttributes.get(element);
+          if (!stored) {
+            stored = {};
+            translatedAttributes.forEach(attribute => {
+              if (element.hasAttribute(attribute)) stored[attribute] = element.getAttribute(attribute);
+            });
+            originalAttributes.set(element, stored);
+          }
+          translatedAttributes.forEach(attribute => {
+            if (!(attribute in stored)) return;
+            const original = stored[attribute];
+            element.setAttribute(attribute, language === 'zh-Hant' ? (ZH_TRANSLATIONS[original] || original) : original);
+          });
+        });
+      };
+
       const departure = new Date('2026-09-10T10:25:00+08:00');
       const end = new Date('2026-10-11T10:10:00+08:00');
       const now = new Date();
       const number = document.getElementById('countdownNumber');
       const label = document.getElementById('countdownLabel');
       const day = 86400000;
-      if (now < departure) {
-        const days = Math.ceil((departure - now) / day);
-        number.textContent = days;
-        label.textContent = days === 1 ? 'day to departure' : 'days to departure';
-      } else if (now <= end) {
-        number.textContent = 'In progress';
-        label.textContent = 'trip underway';
-      } else {
-        number.textContent = 'Complete';
-        label.textContent = 'trip dates passed';
-      }
+      const updateCountdown = () => {
+        if (now < departure) {
+          const days = Math.ceil((departure - now) / day);
+          number.textContent = days;
+          label.textContent = uiText(days === 1 ? 'day to departure' : 'days to departure');
+        } else if (now <= end) {
+          number.textContent = uiText('In progress');
+          label.textContent = uiText('trip underway');
+        } else {
+          number.textContent = uiText('Complete');
+          label.textContent = uiText('trip dates passed');
+        }
+      };
 
       const toast = document.getElementById('toast');
       let toastTimer;
       const showToast = message => {
-        toast.textContent = message;
+        toast.textContent = uiText(message);
         toast.classList.add('show');
         clearTimeout(toastTimer);
         toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
@@ -583,7 +904,7 @@
 
       document.getElementById('printButton').addEventListener('click', () => window.print());
       document.getElementById('shareButton').addEventListener('click', async () => {
-        const payload = { title: document.title, text: 'Montreal · Detroit · Spain trip board', url: location.href };
+        const payload = { title: document.title, text: uiText('Montreal · Detroit · Spain trip board'), url: location.href };
         try {
           if (navigator.share && location.protocol.startsWith('http')) {
             await navigator.share(payload);
@@ -602,16 +923,24 @@
       const noteCount = document.getElementById('noteCount');
       const saveState = document.getElementById('saveState');
       const storageKey = 'montreal-detroit-spain-2026-notes';
+      let saveStateKey = 'Saved locally';
       try { notes.value = localStorage.getItem(storageKey) || ''; } catch (_) {}
       noteCount.textContent = notes.value.length;
       let saveTimer;
       notes.addEventListener('input', () => {
         noteCount.textContent = notes.value.length;
-        saveState.textContent = 'Saving…';
+        saveStateKey = 'Saving…';
+        saveState.textContent = uiText(saveStateKey);
         clearTimeout(saveTimer);
         saveTimer = setTimeout(() => {
-          try { localStorage.setItem(storageKey, notes.value); saveState.textContent = 'Saved locally'; }
-          catch (_) { saveState.textContent = 'Local save unavailable'; }
+          try {
+            localStorage.setItem(storageKey, notes.value);
+            saveStateKey = 'Saved locally';
+            saveState.textContent = uiText(saveStateKey);
+          } catch (_) {
+            saveStateKey = 'Local save unavailable';
+            saveState.textContent = uiText(saveStateKey);
+          }
         }, 220);
       });
 
@@ -622,6 +951,34 @@
           try { localStorage.setItem(key, String(box.checked)); } catch (_) {}
         });
       });
+
+      const englishButton = document.getElementById('languageEnglish');
+      const chineseButton = document.getElementById('languageChinese');
+      const languageGroup = document.querySelector('.language-switch');
+      const languageStorageKey = 'montreal-detroit-spain-2026-language';
+
+      const setLanguage = language => {
+        currentLanguage = language === 'zh-Hant' ? 'zh-Hant' : 'en';
+        document.documentElement.lang = currentLanguage;
+        captureAndTranslate(currentLanguage);
+        document.title = uiText('Montreal · Detroit · Spain — Trip Board');
+        document.querySelector('meta[name="description"]').setAttribute('content', uiText('Share-safe trip dashboard for Montreal, Detroit, Bilbao and Barcelona in 2026.'));
+        languageGroup.setAttribute('aria-label', uiText('Language'));
+        englishButton.classList.toggle('active', currentLanguage === 'en');
+        chineseButton.classList.toggle('active', currentLanguage === 'zh-Hant');
+        englishButton.setAttribute('aria-pressed', String(currentLanguage === 'en'));
+        chineseButton.setAttribute('aria-pressed', String(currentLanguage === 'zh-Hant'));
+        saveState.textContent = uiText(saveStateKey);
+        updateCountdown();
+        try { localStorage.setItem(languageStorageKey, currentLanguage); } catch (_) {}
+      };
+
+      englishButton.addEventListener('click', () => setLanguage('en'));
+      chineseButton.addEventListener('click', () => setLanguage('zh-Hant'));
+
+      let savedLanguage = 'en';
+      try { savedLanguage = localStorage.getItem(languageStorageKey) || 'en'; } catch (_) {}
+      setLanguage(savedLanguage);
     })();
   </script>
 </body>
