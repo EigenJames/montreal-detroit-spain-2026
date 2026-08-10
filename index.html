@@ -80,7 +80,12 @@
       letter-spacing: -.035em;
       line-height: 1.05;
     }
+    .product-label { margin-bottom: 5px; color: var(--blue); font-size: 10px; font-weight: 900; letter-spacing: .09em; text-transform: uppercase; }
     .brand p { margin: 5px 0 0; color: var(--muted); font-size: 14px; }
+    .brand-meta { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+    .privacy-mode { display: inline-flex; align-items: center; gap: 6px; color: #536985; font-size: 11px; font-weight: 750; }
+    .privacy-mode::before { content: ""; width: 7px; height: 7px; background: var(--green); border-radius: 50%; }
+    .privacy-mode.private::before { background: var(--amber); }
     .header-actions { display: flex; align-items: center; gap: 9px; }
     .button {
       display: inline-flex;
@@ -107,6 +112,11 @@
     .language-switch button.active { color: #fff; background: var(--ink); box-shadow: 0 2px 6px rgba(16, 36, 62, .14); }
     .last-updated { padding-left: 13px; margin-left: 4px; border-left: 1px solid var(--line); color: var(--muted); font-size: 12px; }
 
+    .workspace-tabs { display: grid; grid-template-columns: 1fr 1fr; background: #fff; border-bottom: 1px solid var(--line); }
+    .workspace-tabs button { min-height: 48px; color: var(--muted); background: #fff; border: 0; border-right: 1px solid var(--line); cursor: pointer; font-size: 12px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+    .workspace-tabs button:last-child { border-right: 0; }
+    .workspace-tabs button.active { color: var(--blue); box-shadow: inset 0 3px 0 var(--blue); background: #fbfdff; }
+
     .subnav {
       display: flex;
       gap: 6px;
@@ -119,6 +129,8 @@
     .subnav::-webkit-scrollbar { display: none; }
     .subnav a { padding: 8px 11px; color: var(--muted); border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: 800; white-space: nowrap; }
     .subnav a:hover { color: var(--blue); background: var(--blue-soft); }
+    .subnav[hidden] { display: none; }
+    .workspace-view[hidden] { display: none !important; }
 
     main { padding: 24px 30px 44px; }
     .hero-grid { display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(320px, .85fr); gap: 16px; }
@@ -262,12 +274,83 @@
     .source-list span { display: block; color: var(--muted); font-size: 10px; }
     .privacy-note { margin-top: 15px; padding: 12px; color: #66511f; background: var(--amber-soft); border-radius: 10px; font-size: 11px; }
 
+    .private-banner { display: flex; align-items: center; gap: 10px; margin: -4px -30px 24px; padding: 11px 30px; color: #76520a; background: var(--amber-soft); border-bottom: 1px solid #efd089; font-size: 12px; font-weight: 750; }
+    .private-banner svg { flex: 0 0 auto; width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.9; }
+    .closeout-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; margin-bottom: 18px; }
+    .closeout-head h2 { margin: 0; font-family: var(--font-display); font-size: clamp(30px, 4vw, 48px); letter-spacing: -.035em; }
+    .closeout-head p { margin: 5px 0 0; color: var(--muted); font-size: 13px; }
+    .readiness { color: var(--ink); font-size: 12px; font-weight: 850; white-space: nowrap; }
+    .closeout-steps { display: grid; grid-template-columns: repeat(3, 1fr); margin-bottom: 20px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .closeout-step { display: flex; gap: 10px; align-items: center; padding: 15px 12px; border-right: 1px solid var(--line); }
+    .closeout-step:last-child { border-right: 0; }
+    .step-number { display: grid; place-items: center; flex: 0 0 auto; width: 30px; height: 30px; color: var(--ink); background: #edf2f8; border-radius: 50%; font-weight: 900; }
+    .closeout-step strong { display: block; font-size: 12px; }
+    .closeout-step span { display: block; margin-top: 1px; color: var(--orange); font-size: 10px; font-weight: 750; }
+    .closeout-grid { display: grid; grid-template-columns: minmax(0, 2.05fr) minmax(300px, .95fr); gap: 16px; align-items: start; }
+    .closeout-main, .evidence-card, .report-card { padding: 20px; }
+    .closeout-main h3, .evidence-card h3, .report-card h3 { margin: 0; font-family: var(--font-display); font-size: 22px; }
+    .closeout-sidebar { display: grid; gap: 16px; }
+    .trip-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 18px 0 20px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+    .field { display: grid; gap: 5px; }
+    .field.wide { grid-column: 1 / -1; }
+    .field label { color: #52657d; font-size: 10px; font-weight: 850; letter-spacing: .05em; text-transform: uppercase; }
+    .field input, .field select { width: 100%; min-height: 40px; padding: 8px 10px; color: var(--ink); background: #fff; border: 1px solid #bfcbd8; border-radius: 8px; font-size: 12px; }
+    .expense-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin: 0 0 12px; }
+    .expense-toolbar-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .expense-form { display: none; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 12px 0 16px; padding: 14px; background: #f8fafc; border: 1px solid var(--line); border-radius: 12px; }
+    .expense-form.open { display: grid; }
+    .expense-form .form-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 8px; }
+    .expense-table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+    .expense-table { min-width: 820px; }
+    .expense-table th, .expense-table td { padding: 10px; }
+    .expense-table input, .expense-table select { min-width: 90px; padding: 6px; color: var(--ink); background: #fff; border: 1px solid transparent; border-radius: 6px; font-size: 11px; }
+    .expense-table input:focus, .expense-table select:focus { border-color: var(--blue); outline: none; }
+    .expense-empty { padding: 28px 18px !important; color: var(--muted); text-align: center; }
+    .icon-button { width: 30px; height: 30px; color: var(--muted); background: transparent; border: 1px solid transparent; border-radius: 7px; cursor: pointer; }
+    .icon-button:hover { color: var(--red); background: var(--red-soft); }
+    .expense-total { display: flex; justify-content: flex-end; gap: 18px; align-items: baseline; margin-top: 14px; padding-top: 13px; border-top: 1px solid var(--line); }
+    .expense-total span { color: var(--muted); font-size: 11px; font-weight: 800; }
+    .expense-total strong { font-family: var(--font-display); font-size: 24px; }
+    .folder-picker { display: grid; place-items: center; min-height: 130px; margin: 15px 0 12px; padding: 18px; color: var(--blue); background: #fbfdff; border: 1.5px dashed var(--blue); border-radius: 12px; cursor: pointer; text-align: center; }
+    .folder-picker svg { width: 34px; height: 34px; margin-bottom: 6px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .folder-picker strong, .folder-picker span { display: block; }
+    .folder-picker span { margin-top: 3px; color: var(--muted); font-size: 10px; }
+    .folder-picker input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+    .file-list { margin: 0; padding: 0; list-style: none; }
+    .file-list li { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 9px 0; border-bottom: 1px solid #e8edf2; font-size: 11px; }
+    .file-list li:last-child { border-bottom: 0; }
+    .file-list span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .file-list small { color: var(--green); font-weight: 800; }
+    .file-empty { color: var(--muted); font-size: 11px; }
+    .report-includes { margin: 12px 0 16px; padding-left: 18px; color: #465a73; font-size: 11px; }
+    .report-includes li + li { margin-top: 6px; }
+    .template-note { margin-top: 11px; color: var(--muted); font-size: 10px; }
+    .admin-report { display: none; }
+    .report-page { max-width: 820px; margin: 0 auto; color: #111; font-family: Arial, "PingFang TC", sans-serif; }
+    .report-header { display: flex; justify-content: space-between; gap: 24px; padding-bottom: 14px; border-bottom: 2px solid #111; }
+    .report-header h1 { margin: 0; font-size: 24px; }
+    .report-meta { font-size: 10px; text-align: right; }
+    .report-section { margin-top: 20px; }
+    .report-section h2 { margin: 0 0 8px; font-size: 14px; }
+    .report-table { min-width: 0; font-size: 9px; }
+    .report-table th, .report-table td { padding: 6px; border: 1px solid #999; }
+    .report-table th { color: #111; background: #f1f1f1; }
+    .report-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .report-summary div { padding: 10px; border: 1px solid #999; }
+    .report-summary span { display: block; font-size: 8px; text-transform: uppercase; }
+    .report-summary strong { display: block; margin-top: 4px; font-size: 15px; }
+    .evidence-sheet { break-before: page; padding-top: 10px; }
+    .evidence-item { break-inside: avoid; margin: 0 0 18px; }
+    .evidence-item h3 { margin: 0 0 7px; font-size: 11px; }
+    .evidence-item img { display: block; max-width: 100%; max-height: 860px; margin: 0 auto; object-fit: contain; }
+    .evidence-placeholder { padding: 30px; color: #555; border: 1px solid #aaa; text-align: center; font-size: 10px; }
+
     .toast { position: fixed; z-index: 100; right: 22px; bottom: 22px; max-width: min(360px, calc(100% - 44px)); padding: 12px 15px; color: #fff; background: var(--ink); border-radius: 10px; box-shadow: var(--shadow); font-size: 12px; opacity: 0; transform: translateY(12px); pointer-events: none; transition: .2s ease; }
     .toast.show { opacity: 1; transform: translateY(0); }
     .footer { display: flex; justify-content: space-between; gap: 20px; padding: 18px 30px; color: var(--muted); background: #f8fafc; border-top: 1px solid var(--line); font-size: 10px; }
 
     @media (max-width: 1050px) {
-      .hero-grid, .stay-grid, .conference-layout, .notes-grid { grid-template-columns: 1fr; }
+      .hero-grid, .stay-grid, .conference-layout, .notes-grid, .closeout-grid { grid-template-columns: 1fr; }
       .attention-list { display: grid; grid-template-columns: 1fr 1fr; column-gap: 18px; }
       .section-heading { align-items: flex-start; }
     }
@@ -294,6 +377,13 @@
       .footer { display: block; padding: 16px 18px; }
       .footer span { display: block; margin-top: 5px; }
       .button .wide-label { display: none; }
+      .private-banner { margin-left: -16px; margin-right: -16px; padding-left: 16px; padding-right: 16px; }
+      .closeout-head { align-items: flex-start; }
+      .closeout-steps { grid-template-columns: 1fr; }
+      .closeout-step { border-right: 0; border-bottom: 1px solid var(--line); }
+      .closeout-step:last-child { border-bottom: 0; }
+      .trip-fields, .expense-form { grid-template-columns: 1fr; }
+      .expense-form .form-actions, .field.wide { grid-column: 1; }
     }
     @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
     @media print {
@@ -306,6 +396,10 @@
       .content-section { break-before: auto; }
       .hero-grid, .stay-grid, .conference-layout { grid-template-columns: 1fr; }
       a { text-decoration: none; }
+      body.printing-report .shell, body.printing-report .toast { display: none !important; }
+      body.printing-report .admin-report { display: block !important; }
+      body.printing-report { font-size: 10px; }
+      body.printing-report .report-page { max-width: none; }
     }
   </style>
 </head>
@@ -321,27 +415,36 @@
   <div class="shell">
     <header class="site-header">
       <div class="brand">
+        <div class="product-label">Business Trip Workspace</div>
         <h1>Montreal · Detroit · Spain</h1>
-        <p>10 September — 11 October 2026 · James’s share-safe trip board</p>
+        <div class="brand-meta"><p>10 September — 11 October 2026 · Company travel + personal extension</p><span class="privacy-mode" id="privacyMode">Public view · share-safe</span></div>
       </div>
       <div class="header-actions">
+        <button class="button" id="switchTripButton" type="button" title="Future trips can reuse this workspace">Switch trip</button>
         <div class="language-switch" role="group" aria-label="Language" data-no-translate>
           <button id="languageEnglish" type="button" aria-pressed="true">EN</button>
           <button id="languageChinese" type="button" aria-pressed="false">中文</button>
         </div>
-        <button class="button primary" id="shareButton" type="button" aria-label="Share this dashboard">
+        <button class="button primary plan-only" id="shareButton" type="button" aria-label="Share this dashboard">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-4M8.6 13.5l6.8 4"/></svg>
           <span class="wide-label">Share</span>
         </button>
-        <button class="button" id="printButton" type="button" aria-label="Print this dashboard">
+        <button class="button plan-only" id="printButton" type="button" aria-label="Print this dashboard">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>
           <span class="wide-label">Print</span>
         </button>
-        <div class="last-updated">Conversation reviewed · 6 Aug 2026</div>
+        <button class="button closeout-only" id="saveDraftButton" type="button" hidden>Save draft</button>
+        <button class="button primary closeout-only" id="generateReportButton" type="button" hidden>Generate admin PDF</button>
+        <div class="last-updated plan-only">Conversation reviewed · 6 Aug 2026</div>
       </div>
     </header>
 
-    <nav class="subnav" aria-label="Dashboard sections">
+    <div class="workspace-tabs" role="tablist" aria-label="Workspace mode">
+      <button id="planModeButton" class="active" type="button" role="tab" aria-selected="true" aria-controls="tripPlanView">Trip plan</button>
+      <button id="closeoutModeButton" type="button" role="tab" aria-selected="false" aria-controls="closeoutView">Close-out</button>
+    </div>
+
+    <nav class="subnav" id="planSubnav" aria-label="Dashboard sections">
       <a href="#overview">Overview</a>
       <a href="#flights">Flights</a>
       <a href="#stays">Stays & ground</a>
@@ -349,8 +452,15 @@
       <a href="#day-plan">Day-by-day</a>
       <a href="#notes">Notes & sources</a>
     </nav>
+    <nav class="subnav" id="closeoutSubnav" aria-label="Close-out sections" hidden>
+      <a href="#closeout-summary">Summary</a>
+      <a href="#expense-register">Expenses</a>
+      <a href="#evidence-folder">Evidence</a>
+      <a href="#report-preview">Report preview</a>
+    </nav>
 
     <main>
+      <div class="workspace-view" id="tripPlanView" role="tabpanel" aria-labelledby="planModeButton">
       <section class="hero-grid" id="overview" aria-label="Trip overview">
         <div class="panel journey">
           <div class="journey-head">
@@ -565,10 +675,102 @@
           </aside>
         </div>
       </section>
+      </div>
+
+      <section class="workspace-view" id="closeoutView" role="tabpanel" aria-labelledby="closeoutModeButton" hidden>
+        <div class="private-banner">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.8 6v5.4c0 4.5 2.9 8.5 7.2 9.6 4.3-1.1 7.2-5.1 7.2-9.6V6L12 3Z"/><path d="M9.5 11.2V9.7a2.5 2.5 0 0 1 5 0v1.5M9 11.2h6v4.7H9z"/></svg>
+          <span><strong>Private workspace.</strong> Receipts stay on this device and are never published to GitHub.</span>
+        </div>
+
+        <div class="closeout-head" id="closeout-summary">
+          <div><h2>Expense close-out</h2><p>Review costs, match evidence, then create the package for Taiwan administration.</p></div>
+          <div class="readiness" id="readinessText">0 of 3 checks ready</div>
+        </div>
+
+        <div class="closeout-steps" aria-label="Close-out readiness">
+          <div class="closeout-step"><span class="step-number">1</span><div><strong>Trip details</strong><span id="detailsStep">Needs admin code</span></div></div>
+          <div class="closeout-step"><span class="step-number">2</span><div><strong>Expenses</strong><span id="expensesStep">No entries yet</span></div></div>
+          <div class="closeout-step"><span class="step-number">3</span><div><strong>Evidence</strong><span id="evidenceStep">Choose receipt folder</span></div></div>
+        </div>
+
+        <div class="closeout-grid">
+          <div class="panel closeout-main" id="expense-register">
+            <h3>Trip details</h3>
+            <div class="trip-fields">
+              <div class="field"><label for="reportTripName">Trip name</label><input id="reportTripName" value="Montreal · Detroit · Spain"></div>
+              <div class="field"><label for="reportDates">Travel dates</label><input id="reportDates" value="10 Sep — 11 Oct 2026"></div>
+              <div class="field"><label for="reportTraveler">Traveler</label><input id="reportTraveler" value="James Lin"></div>
+              <div class="field"><label for="reportAdminCode">Admin / CLSI code</label><input id="reportAdminCode" placeholder="Add the code required by administration"></div>
+              <div class="field wide"><label for="reportPurpose">Business purpose</label><input id="reportPurpose" value="ASME DRIVN conference and business meetings"></div>
+            </div>
+
+            <div class="expense-toolbar">
+              <h3>Expense register</h3>
+              <div class="expense-toolbar-actions">
+                <button class="button primary" id="addExpenseButton" type="button">+ Add expense</button>
+                <button class="button" id="downloadBackupButton" type="button">Download backup</button>
+              </div>
+            </div>
+
+            <form class="expense-form" id="expenseForm">
+              <div class="field"><label for="expenseDate">Date</label><input id="expenseDate" type="date" required></div>
+              <div class="field"><label for="expenseMerchant">Merchant / item</label><input id="expenseMerchant" required placeholder="Hotel, taxi, meal…"></div>
+              <div class="field"><label for="expenseCategory">Category</label><select id="expenseCategory"><option>Accommodation</option><option>Transport</option><option>Meals</option><option>Telecom</option><option>Conference</option><option>Other</option></select></div>
+              <div class="field"><label for="expenseCurrency">Currency</label><input id="expenseCurrency" value="CAD" maxlength="3" required></div>
+              <div class="field"><label for="expenseOriginal">Original amount</label><input id="expenseOriginal" type="number" min="0" step="0.01" required></div>
+              <div class="field"><label for="expenseTwd">TWD charged</label><input id="expenseTwd" type="number" min="0" step="1" required></div>
+              <div class="field"><label for="expenseFee">Service fee (TWD)</label><input id="expenseFee" type="number" min="0" step="1" value="0"></div>
+              <div class="field"><label for="expenseEvidence">Evidence filename</label><input id="expenseEvidence" placeholder="Optional"></div>
+              <div class="form-actions"><button class="button" id="cancelExpenseButton" type="button">Cancel</button><button class="button primary" type="submit">Add to report</button></div>
+            </form>
+
+            <div class="expense-table-wrap">
+              <table class="expense-table">
+                <thead><tr><th>Date</th><th>Merchant / item</th><th>Category</th><th>Currency</th><th>Original</th><th>TWD charged</th><th>Fee</th><th>Evidence</th><th></th></tr></thead>
+                <tbody id="expenseRows"></tbody>
+              </table>
+            </div>
+            <div class="expense-total"><span>Claim total</span><strong id="claimTotal">TWD 0</strong></div>
+          </div>
+
+          <aside class="closeout-sidebar">
+            <section class="panel evidence-card" id="evidence-folder">
+              <h3>Evidence folder</h3>
+              <label class="folder-picker" for="receiptFolder">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5h6l2 2h10v10H3z"/><path d="M3 8.5V5h6l2 2h10v1.5"/></svg>
+                <strong>Choose receipt folder</strong><span>PDF, JPG, PNG · processed locally</span>
+                <input id="receiptFolder" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" multiple webkitdirectory>
+              </label>
+              <p class="file-empty" id="fileEmpty">No receipt files selected. Your browser will ask permission each time you reopen the page.</p>
+              <ul class="file-list" id="fileList"></ul>
+            </section>
+
+            <section class="panel report-card" id="report-preview">
+              <h3>Admin report</h3>
+              <p class="small-muted">The generated PDF will include:</p>
+              <ul class="report-includes"><li>TWD summary</li><li>Foreign-currency reconciliation</li><li>Expense lines</li><li>Telecom allocation</li><li>Numbered evidence appendix</li></ul>
+              <button class="button primary" id="previewReportButton" type="button">Preview / print report</button>
+              <div class="template-note">Based on your Taiwan Office reimbursement example. Sensitive details are never added to the public itinerary HTML.</div>
+            </section>
+          </aside>
+        </div>
+      </section>
     </main>
 
     <footer class="footer"><strong>Montreal · Detroit · Spain · 2026</strong><span>Built from the Travel-project conversation with Celine; verify all bookings against issued confirmations.</span></footer>
   </div>
+
+  <section class="admin-report" id="adminReport" aria-hidden="true">
+    <div class="report-page">
+      <header class="report-header"><div><h1>Business Trip Reimbursement</h1><div id="printTripName"></div></div><div class="report-meta" id="printMeta"></div></header>
+      <section class="report-section"><h2>1. TWD claim summary</h2><div class="report-summary" id="printSummary"></div></section>
+      <section class="report-section"><h2>2. Foreign-currency reconciliation</h2><table class="report-table"><thead><tr><th>Currency</th><th>Category</th><th>Original amount</th><th>TWD charged</th><th>Service fee</th></tr></thead><tbody id="printCurrencyRows"></tbody></table></section>
+      <section class="report-section"><h2>3. Expense lines</h2><table class="report-table"><thead><tr><th>Date</th><th>Merchant / item</th><th>Category</th><th>Original amount</th><th>TWD charged</th><th>Fee</th><th>Evidence</th></tr></thead><tbody id="printExpenseRows"></tbody></table></section>
+      <section class="report-section"><h2>4. Telecom allocation</h2><table class="report-table"><thead><tr><th>Date</th><th>Provider / item</th><th>Original amount</th><th>Claimable TWD</th><th>Evidence</th></tr></thead><tbody id="printTelecomRows"></tbody></table></section>
+      <section class="report-section evidence-sheet"><h2>5. Numbered evidence appendix</h2><div id="printEvidence"></div></section>
+    </div>
+  </section>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -580,6 +782,93 @@
         with its Traditional Chinese translation. Exact matches switch automatically.
       */
       const ZH_TRANSLATIONS = Object.freeze({
+        "Business Trip Workspace": "商務旅行工作台",
+        "10 September — 11 October 2026 · Company travel + personal extension": "2026 年 9 月 10 日 — 10 月 11 日 · 公務行程＋私人延伸",
+        "Public view · share-safe": "公開檢視 · 安全分享",
+        "Private workspace · local only": "私人工作區 · 僅限本機",
+        "Future trips can reuse this workspace": "未來旅程可重複使用此工作台",
+        "Switch trip": "切換旅程",
+        "Save draft": "儲存草稿",
+        "Generate admin PDF": "產生行政報帳 PDF",
+        "Workspace mode": "工作台模式",
+        "Trip plan": "行程規劃",
+        "Close-out": "費用結案",
+        "Close-out sections": "費用結案區段",
+        "Summary": "摘要",
+        "Expenses": "費用",
+        "Evidence": "憑證",
+        "Report preview": "報表預覽",
+        "Private workspace.": "私人工作區。",
+        "Receipts stay on this device and are never published to GitHub.": "收據只保留在此裝置上，絕不會發布到 GitHub。",
+        "Expense close-out": "出差費用結案",
+        "Review costs, match evidence, then create the package for Taiwan administration.": "檢查費用、配對憑證，然後建立供台灣行政人員使用的報帳資料包。",
+        "0 of 3 checks ready": "3 項檢查中 0 項完成",
+        "Close-out readiness": "費用結案準備度",
+        "Trip details": "旅程資料",
+        "Needs admin code": "需要行政代碼",
+        "No entries yet": "尚無費用資料",
+        "Ready": "已完成",
+        "Choose receipt folder": "選擇收據資料夾",
+        "Trip name": "旅程名稱",
+        "Travel dates": "旅行日期",
+        "Traveler": "旅客",
+        "Admin / CLSI code": "行政／CLSI 代碼",
+        "Add the code required by administration": "填入行政人員要求的代碼",
+        "Business purpose": "出差目的",
+        "ASME DRIVN conference and business meetings": "ASME DRIVN 大會與商務會議",
+        "Expense register": "費用明細",
+        "+ Add expense": "＋ 新增費用",
+        "Download backup": "下載備份",
+        "Date": "日期",
+        "Merchant / item": "商店／項目",
+        "Hotel, taxi, meal…": "飯店、計程車、餐費…",
+        "Category": "類別",
+        "Accommodation": "住宿",
+        "Transport": "交通",
+        "Meals": "餐費",
+        "Telecom": "電信",
+        "Other": "其他",
+        "Currency": "幣別",
+        "Original amount": "原幣金額",
+        "TWD charged": "信用卡請款 TWD",
+        "Service fee (TWD)": "國外交易服務費（TWD）",
+        "Evidence filename": "憑證檔名",
+        "Optional": "選填",
+        "Cancel": "取消",
+        "Add to report": "加入報表",
+        "Remove expense": "移除費用",
+        "Original": "原幣金額",
+        "Fee": "服務費",
+        "Claim total": "申請總額",
+        "Evidence folder": "憑證資料夾",
+        "PDF, JPG, PNG · processed locally": "PDF、JPG、PNG · 僅在本機處理",
+        "Local only": "僅限本機",
+        "No receipt files selected. Your browser will ask permission each time you reopen the page.": "尚未選擇收據檔案。每次重新開啟頁面時，瀏覽器都會再次詢問存取權限。",
+        "Admin report": "行政報帳報表",
+        "The generated PDF will include:": "產生的 PDF 將包含：",
+        "TWD summary": "TWD 摘要",
+        "Foreign-currency reconciliation": "外幣核對",
+        "Expense lines": "費用明細",
+        "Telecom allocation": "電信費用分攤",
+        "Numbered evidence appendix": "編號憑證附錄",
+        "Preview / print report": "預覽／列印報表",
+        "Based on your Taiwan Office reimbursement example. Sensitive details are never added to the public itinerary HTML.": "依據您的台灣辦公室報帳範例。敏感資料絕不會加入公開的行程 HTML。",
+        "Edit the trip name, dates and purpose for the next destination.": "請為下一個目的地編輯旅程名稱、日期與出差目的。",
+        "Expense added to the private draft.": "費用已加入私人草稿。",
+        "Private draft saved on this device.": "私人草稿已儲存在此裝置。",
+        "Business Trip Reimbursement": "商務旅行費用報帳",
+        "1. TWD claim summary": "1. TWD 申請摘要",
+        "2. Foreign-currency reconciliation": "2. 外幣核對",
+        "3. Expense lines": "3. 費用明細",
+        "4. Telecom allocation": "4. 電信費用分攤",
+        "5. Numbered evidence appendix": "5. 編號憑證附錄",
+        "Card / bill charges": "信用卡／帳單請款",
+        "Service fees": "國外交易服務費",
+        "TWD claim total": "TWD 申請總額",
+        "Not provided": "尚未提供",
+        "No expenses entered.": "尚未輸入費用。",
+        "No telecom allocation entered.": "尚未輸入電信費用分攤。",
+        "No evidence files selected. Attach numbered receipts and statements before submission.": "尚未選擇憑證檔案。送出前請附上編號收據與對帳單。",
         "Montreal · Detroit · Spain — Trip Board": "蒙特婁 · 底特律 · 西班牙 — 旅程看板",
         "Share-safe trip dashboard for Montreal, Detroit, Bilbao and Barcelona in 2026.": "2026 年蒙特婁、底特律、畢爾包與巴塞隆納安全分享旅程看板。",
         "Montreal · Detroit · Spain": "蒙特婁 · 底特律 · 西班牙",
@@ -1006,6 +1295,265 @@
         });
       });
 
+      const closeoutStorageKey = 'business-trip-workspace-montreal-detroit-spain-2026';
+      const closeoutFields = ['reportTripName', 'reportDates', 'reportTraveler', 'reportAdminCode', 'reportPurpose'];
+      const expenseCategories = ['Accommodation', 'Transport', 'Meals', 'Telecom', 'Conference', 'Other'];
+      let expenses = [];
+      let receiptFiles = [];
+      let receiptUrls = [];
+
+      const planModeButton = document.getElementById('planModeButton');
+      const closeoutModeButton = document.getElementById('closeoutModeButton');
+      const tripPlanView = document.getElementById('tripPlanView');
+      const closeoutView = document.getElementById('closeoutView');
+      const planSubnav = document.getElementById('planSubnav');
+      const closeoutSubnav = document.getElementById('closeoutSubnav');
+      const privacyMode = document.getElementById('privacyMode');
+      const planOnly = [...document.querySelectorAll('.plan-only')];
+      const closeoutOnly = [...document.querySelectorAll('.closeout-only')];
+
+      const setWorkspaceMode = mode => {
+        const closeout = mode === 'closeout';
+        tripPlanView.hidden = closeout;
+        closeoutView.hidden = !closeout;
+        planSubnav.hidden = closeout;
+        closeoutSubnav.hidden = !closeout;
+        planModeButton.classList.toggle('active', !closeout);
+        closeoutModeButton.classList.toggle('active', closeout);
+        planModeButton.setAttribute('aria-selected', String(!closeout));
+        closeoutModeButton.setAttribute('aria-selected', String(closeout));
+        planOnly.forEach(element => element.hidden = closeout);
+        closeoutOnly.forEach(element => element.hidden = !closeout);
+        privacyMode.textContent = uiText(closeout ? 'Private workspace · local only' : 'Public view · share-safe');
+        privacyMode.classList.toggle('private', closeout);
+        try { sessionStorage.setItem('business-trip-workspace-mode', closeout ? 'closeout' : 'plan'); } catch (_) {}
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      planModeButton.addEventListener('click', () => setWorkspaceMode('plan'));
+      closeoutModeButton.addEventListener('click', () => setWorkspaceMode('closeout'));
+      document.getElementById('switchTripButton').addEventListener('click', () => {
+        setWorkspaceMode('closeout');
+        document.getElementById('reportTripName').focus();
+        document.getElementById('reportTripName').select();
+        showToast('Edit the trip name, dates and purpose for the next destination.');
+      });
+
+      const safeNumber = value => Number.isFinite(Number(value)) ? Number(value) : 0;
+      const claimTotal = () => expenses.reduce((sum, item) => sum + safeNumber(item.twd) + safeNumber(item.fee), 0);
+      const formatTwd = value => `TWD ${Math.round(value).toLocaleString('en-US')}`;
+
+      const saveCloseoutDraft = () => {
+        const fields = {};
+        closeoutFields.forEach(id => fields[id] = document.getElementById(id).value);
+        try {
+          localStorage.setItem(closeoutStorageKey, JSON.stringify({ fields, expenses }));
+          return true;
+        } catch (_) {
+          return false;
+        }
+      };
+
+      const loadCloseoutDraft = () => {
+        try {
+          const saved = JSON.parse(localStorage.getItem(closeoutStorageKey) || 'null');
+          if (!saved) return;
+          Object.entries(saved.fields || {}).forEach(([id, value]) => {
+            const field = document.getElementById(id);
+            if (field) field.value = value;
+          });
+          if (Array.isArray(saved.expenses)) expenses = saved.expenses;
+        } catch (_) {}
+      };
+
+      const updateReadiness = () => {
+        const detailsReady = Boolean(document.getElementById('reportAdminCode').value.trim());
+        const expensesReady = expenses.length > 0;
+        const evidenceReady = receiptFiles.length > 0;
+        const ready = [detailsReady, expensesReady, evidenceReady].filter(Boolean).length;
+        document.getElementById('readinessText').textContent = currentLanguage === 'zh-Hant' ? `3 項檢查中 ${ready} 項完成` : `${ready} of 3 checks ready`;
+        document.getElementById('detailsStep').textContent = uiText(detailsReady ? 'Ready' : 'Needs admin code');
+        document.getElementById('expensesStep').textContent = expensesReady ? (currentLanguage === 'zh-Hant' ? `${expenses.length} 筆費用` : `${expenses.length} expense ${expenses.length === 1 ? 'entry' : 'entries'}`) : uiText('No entries yet');
+        document.getElementById('evidenceStep').textContent = evidenceReady ? (currentLanguage === 'zh-Hant' ? `${receiptFiles.length} 個檔案` : `${receiptFiles.length} evidence ${receiptFiles.length === 1 ? 'file' : 'files'}`) : uiText('Choose receipt folder');
+      };
+
+      const makeInput = (value, type, index, field) => {
+        const input = document.createElement('input');
+        input.type = type;
+        input.value = value ?? '';
+        if (type === 'number') { input.min = '0'; input.step = field === 'original' ? '0.01' : '1'; }
+        input.setAttribute('aria-label', field);
+        input.addEventListener('change', () => {
+          expenses[index][field] = type === 'number' ? safeNumber(input.value) : input.value;
+          saveCloseoutDraft();
+          renderExpenses();
+        });
+        return input;
+      };
+
+      const renderExpenses = () => {
+        const rows = document.getElementById('expenseRows');
+        rows.replaceChildren();
+        if (!expenses.length) {
+          const row = document.createElement('tr');
+          const cell = document.createElement('td');
+          cell.colSpan = 9;
+          cell.className = 'expense-empty';
+          cell.textContent = currentLanguage === 'zh-Hant' ? '尚未新增費用。旅途中可以逐筆加入，或在返程後一次整理。' : 'No expenses yet. Add them during the trip or complete the register after you return.';
+          row.appendChild(cell);
+          rows.appendChild(row);
+        } else {
+          expenses.forEach((item, index) => {
+            const row = document.createElement('tr');
+            const addCell = child => { const cell = document.createElement('td'); cell.appendChild(child); row.appendChild(cell); };
+            addCell(makeInput(item.date, 'date', index, 'date'));
+            addCell(makeInput(item.merchant, 'text', index, 'merchant'));
+            const category = document.createElement('select');
+            expenseCategories.forEach(name => { const option = document.createElement('option'); option.value = name; option.textContent = uiText(name); option.selected = item.category === name; category.appendChild(option); });
+            category.addEventListener('change', () => { expenses[index].category = category.value; saveCloseoutDraft(); renderExpenses(); });
+            addCell(category);
+            addCell(makeInput(item.currency, 'text', index, 'currency'));
+            addCell(makeInput(item.original, 'number', index, 'original'));
+            addCell(makeInput(item.twd, 'number', index, 'twd'));
+            addCell(makeInput(item.fee, 'number', index, 'fee'));
+            addCell(makeInput(item.evidence, 'text', index, 'evidence'));
+            const remove = document.createElement('button');
+            remove.type = 'button'; remove.className = 'icon-button'; remove.title = uiText('Remove expense'); remove.textContent = '×';
+            remove.addEventListener('click', () => { expenses.splice(index, 1); saveCloseoutDraft(); renderExpenses(); });
+            addCell(remove);
+            rows.appendChild(row);
+          });
+        }
+        document.getElementById('claimTotal').textContent = formatTwd(claimTotal());
+        updateReadiness();
+      };
+
+      const expenseForm = document.getElementById('expenseForm');
+      document.getElementById('addExpenseButton').addEventListener('click', () => {
+        expenseForm.classList.add('open');
+        document.getElementById('expenseDate').focus();
+      });
+      document.getElementById('cancelExpenseButton').addEventListener('click', () => expenseForm.classList.remove('open'));
+      expenseForm.addEventListener('submit', event => {
+        event.preventDefault();
+        expenses.push({
+          date: document.getElementById('expenseDate').value,
+          merchant: document.getElementById('expenseMerchant').value.trim(),
+          category: document.getElementById('expenseCategory').value,
+          currency: document.getElementById('expenseCurrency').value.trim().toUpperCase(),
+          original: safeNumber(document.getElementById('expenseOriginal').value),
+          twd: safeNumber(document.getElementById('expenseTwd').value),
+          fee: safeNumber(document.getElementById('expenseFee').value),
+          evidence: document.getElementById('expenseEvidence').value.trim()
+        });
+        expenseForm.reset();
+        document.getElementById('expenseCurrency').value = 'CAD';
+        document.getElementById('expenseFee').value = '0';
+        expenseForm.classList.remove('open');
+        saveCloseoutDraft();
+        renderExpenses();
+        showToast('Expense added to the private draft.');
+      });
+
+      closeoutFields.forEach(id => document.getElementById(id).addEventListener('input', () => { saveCloseoutDraft(); updateReadiness(); }));
+      document.getElementById('saveDraftButton').addEventListener('click', () => showToast(saveCloseoutDraft() ? 'Private draft saved on this device.' : 'Local save unavailable'));
+
+      document.getElementById('downloadBackupButton').addEventListener('click', () => {
+        const fields = {};
+        closeoutFields.forEach(id => fields[id] = document.getElementById(id).value);
+        const blob = new Blob([JSON.stringify({ version: 1, fields, expenses, evidenceFilenames: receiptFiles.map(file => file.name) }, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${(fields.reportTripName || 'business-trip').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase()}-closeout.json`;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      });
+
+      document.getElementById('receiptFolder').addEventListener('change', event => {
+        receiptUrls.forEach(url => URL.revokeObjectURL(url));
+        receiptFiles = [...event.target.files].filter(file => /\.(pdf|jpe?g|png|webp)$/i.test(file.name));
+        receiptUrls = receiptFiles.map(file => URL.createObjectURL(file));
+        const list = document.getElementById('fileList');
+        list.replaceChildren();
+        document.getElementById('fileEmpty').hidden = receiptFiles.length > 0;
+        receiptFiles.slice(0, 12).forEach((file, index) => {
+          const item = document.createElement('li');
+          const name = document.createElement('span'); name.textContent = file.webkitRelativePath || file.name;
+          const status = document.createElement('small'); status.textContent = uiText('Local only');
+          item.append(name, status); list.appendChild(item);
+        });
+        if (receiptFiles.length > 12) {
+          const item = document.createElement('li'); item.textContent = currentLanguage === 'zh-Hant' ? `另有 ${receiptFiles.length - 12} 個檔案` : `+ ${receiptFiles.length - 12} more files`; list.appendChild(item);
+        }
+        updateReadiness();
+      });
+
+      const addTextCell = (row, value) => { const cell = document.createElement('td'); cell.textContent = value; row.appendChild(cell); };
+      const buildAdminReport = () => {
+        const tripName = document.getElementById('reportTripName').value || 'Business trip';
+        const dates = document.getElementById('reportDates').value;
+        const traveler = document.getElementById('reportTraveler').value;
+        const code = document.getElementById('reportAdminCode').value || uiText('Not provided');
+        const purpose = document.getElementById('reportPurpose').value;
+        document.getElementById('printTripName').textContent = `${tripName} · ${dates}`;
+        document.getElementById('printMeta').innerHTML = '';
+        [traveler, code, purpose].forEach(value => { const line = document.createElement('div'); line.textContent = value; document.getElementById('printMeta').appendChild(line); });
+
+        const charged = expenses.reduce((sum, item) => sum + safeNumber(item.twd), 0);
+        const fees = expenses.reduce((sum, item) => sum + safeNumber(item.fee), 0);
+        const summary = document.getElementById('printSummary'); summary.replaceChildren();
+        [['Card / bill charges', charged], ['Service fees', fees], ['TWD claim total', charged + fees]].forEach(([label, value]) => {
+          const box = document.createElement('div'); const caption = document.createElement('span'); const amount = document.createElement('strong');
+          caption.textContent = uiText(label); amount.textContent = formatTwd(value); box.append(caption, amount); summary.appendChild(box);
+        });
+
+        const groups = new Map();
+        expenses.forEach(item => {
+          const key = `${item.currency}|${item.category}`;
+          const group = groups.get(key) || { currency: item.currency, category: item.category, original: 0, twd: 0, fee: 0 };
+          group.original += safeNumber(item.original); group.twd += safeNumber(item.twd); group.fee += safeNumber(item.fee); groups.set(key, group);
+        });
+        const currencyRows = document.getElementById('printCurrencyRows'); currencyRows.replaceChildren();
+        [...groups.values()].forEach(group => { const row = document.createElement('tr'); [group.currency, uiText(group.category), group.original.toFixed(2), Math.round(group.twd).toLocaleString(), Math.round(group.fee).toLocaleString()].forEach(value => addTextCell(row, value)); currencyRows.appendChild(row); });
+        if (!groups.size) { const row = document.createElement('tr'); const cell = document.createElement('td'); cell.colSpan = 5; cell.textContent = uiText('No expenses entered.'); row.appendChild(cell); currencyRows.appendChild(row); }
+
+        const expensePrintRows = document.getElementById('printExpenseRows'); expensePrintRows.replaceChildren();
+        expenses.forEach(item => { const row = document.createElement('tr'); [item.date, item.merchant, uiText(item.category), `${item.currency} ${safeNumber(item.original).toFixed(2)}`, Math.round(safeNumber(item.twd)).toLocaleString(), Math.round(safeNumber(item.fee)).toLocaleString(), item.evidence || '—'].forEach(value => addTextCell(row, value)); expensePrintRows.appendChild(row); });
+        if (!expenses.length) { const row = document.createElement('tr'); const cell = document.createElement('td'); cell.colSpan = 7; cell.textContent = uiText('No expenses entered.'); row.appendChild(cell); expensePrintRows.appendChild(row); }
+
+        const telecomRows = document.getElementById('printTelecomRows'); telecomRows.replaceChildren();
+        const telecom = expenses.filter(item => item.category === 'Telecom');
+        telecom.forEach(item => { const row = document.createElement('tr'); [item.date, item.merchant, `${item.currency} ${safeNumber(item.original).toFixed(2)}`, formatTwd(safeNumber(item.twd) + safeNumber(item.fee)), item.evidence || '—'].forEach(value => addTextCell(row, value)); telecomRows.appendChild(row); });
+        if (!telecom.length) { const row = document.createElement('tr'); const cell = document.createElement('td'); cell.colSpan = 5; cell.textContent = uiText('No telecom allocation entered.'); row.appendChild(cell); telecomRows.appendChild(row); }
+
+        const evidence = document.getElementById('printEvidence'); evidence.replaceChildren();
+        if (!receiptFiles.length) {
+          const placeholder = document.createElement('div'); placeholder.className = 'evidence-placeholder'; placeholder.textContent = uiText('No evidence files selected. Attach numbered receipts and statements before submission.'); evidence.appendChild(placeholder);
+        } else {
+          receiptFiles.forEach((file, index) => {
+            const item = document.createElement('article'); item.className = 'evidence-item';
+            const heading = document.createElement('h3'); heading.textContent = `${index + 1}. ${file.webkitRelativePath || file.name}`; item.appendChild(heading);
+            if (/^image\//.test(file.type)) { const image = document.createElement('img'); image.src = receiptUrls[index]; image.alt = file.name; item.appendChild(image); }
+            else { const placeholder = document.createElement('div'); placeholder.className = 'evidence-placeholder'; placeholder.textContent = `PDF evidence: ${file.name}`; item.appendChild(placeholder); }
+            evidence.appendChild(item);
+          });
+        }
+      };
+
+      const printAdminReport = () => {
+        buildAdminReport();
+        document.getElementById('adminReport').setAttribute('aria-hidden', 'false');
+        document.body.classList.add('printing-report');
+        setTimeout(() => window.print(), 120);
+      };
+      document.getElementById('previewReportButton').addEventListener('click', printAdminReport);
+      document.getElementById('generateReportButton').addEventListener('click', printAdminReport);
+      window.addEventListener('afterprint', () => { document.body.classList.remove('printing-report'); document.getElementById('adminReport').setAttribute('aria-hidden', 'true'); });
+
+      loadCloseoutDraft();
+      renderExpenses();
+
       const englishButton = document.getElementById('languageEnglish');
       const chineseButton = document.getElementById('languageChinese');
       const languageGroup = document.querySelector('.language-switch');
@@ -1023,6 +1571,9 @@
         englishButton.setAttribute('aria-pressed', String(currentLanguage === 'en'));
         chineseButton.setAttribute('aria-pressed', String(currentLanguage === 'zh-Hant'));
         saveState.textContent = uiText(saveStateKey);
+        renderExpenses();
+        updateReadiness();
+        privacyMode.textContent = uiText(closeoutView.hidden ? 'Public view · share-safe' : 'Private workspace · local only');
         updateCountdown();
         try { localStorage.setItem(languageStorageKey, currentLanguage); } catch (_) {}
       };
@@ -1033,6 +1584,9 @@
       let savedLanguage = 'en';
       try { savedLanguage = localStorage.getItem(languageStorageKey) || 'en'; } catch (_) {}
       setLanguage(savedLanguage);
+      let savedMode = 'plan';
+      try { savedMode = sessionStorage.getItem('business-trip-workspace-mode') || 'plan'; } catch (_) {}
+      setWorkspaceMode(savedMode);
     })();
   </script>
 </body>
