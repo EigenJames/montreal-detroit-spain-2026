@@ -262,6 +262,20 @@
     .notes-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(320px, .85fr); gap: 16px; }
     .notes-card, .source-card { padding: 20px; }
     .notes-card h3, .source-card h3 { margin: 0 0 12px; font-size: 14px; }
+    .document-wallet { margin: 0 0 18px; border: 1px solid #c7d4e3; border-radius: 12px; background: #f7faff; overflow: hidden; }
+    .document-wallet summary { padding: 13px 14px; color: var(--ink); cursor: pointer; font-size: 13px; font-weight: 850; }
+    .document-wallet-inner { padding: 0 14px 14px; }
+    .document-wallet-note { margin: 0 0 12px; color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .document-wallet-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .document-entry { padding: 12px; background: #fff; border: 1px solid var(--line); border-radius: 10px; }
+    .document-entry h4 { margin: 0 0 10px; font-size: 12px; }
+    .document-entry label { display: grid; gap: 5px; margin: 9px 0; color: #52657d; font-size: 10px; font-weight: 850; letter-spacing: .04em; text-transform: uppercase; }
+    .document-entry input { width: 100%; min-height: 38px; padding: 8px 9px; color: var(--ink); background: #fff; border: 1px solid #bfcbd8; border-radius: 8px; font: 600 12px/1.2 var(--font-mono); letter-spacing: .04em; }
+    .document-entry input[type="url"] { font-family: var(--font-sans); font-size: 11px; letter-spacing: 0; }
+    .document-email-link { display: inline-flex; margin-top: 4px; color: var(--blue); font-size: 11px; font-weight: 800; text-decoration: none; }
+    .document-email-link:hover { text-decoration: underline; }
+    .document-wallet-actions { display: flex; justify-content: flex-end; align-items: center; margin-top: 13px; }
+    .document-wallet-state { color: var(--muted); font-size: 10px; font-weight: 750; }
     textarea { width: 100%; min-height: 160px; resize: vertical; padding: 14px; color: var(--ink); background: #fbfdff; border: 1px solid #bfcbd8; border-radius: 10px; font-size: 13px; line-height: 1.55; }
     .autosave { display: flex; justify-content: space-between; margin-top: 8px; color: var(--muted); font-size: 10px; }
     .checklist { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
@@ -370,6 +384,7 @@
       .section-heading p { margin-top: 5px; text-align: left; }
       .attention-list { display: block; }
       .tour-options { grid-template-columns: 1fr; }
+      .document-wallet-grid { grid-template-columns: 1fr; }
       .agenda-day { grid-template-columns: 70px 1fr; }
       .plan-row { grid-template-columns: 66px 34px 1fr; }
       .plan-row .status { grid-column: 3; }
@@ -436,7 +451,7 @@
         </button>
         <button class="button closeout-only" id="saveDraftButton" type="button" hidden>Save draft</button>
         <button class="button primary closeout-only" id="generateReportButton" type="button" hidden>Generate admin PDF</button>
-        <div class="last-updated plan-only">Evidence reviewed · 21 Aug 2026</div>
+        <div class="last-updated plan-only">Evidence reviewed · 9 Sep 2026</div>
       </div>
     </header>
 
@@ -489,7 +504,7 @@
             </div>
           </div>
           <div class="journey-footer">
-            <div class="live-status"><i class="pulse"></i><div><strong>Current stage: flights ticketed; Detroit stay confirmed; Bilbao lodging under verification</strong><span>Seven flight segments, the Montreal stay, and the Detroit conference stay are confirmed. CWT has not confirmed the outcome of James’s 13 Aug Bilbao hotel-cancellation request; funding treatment remains TBD.</span></div></div>
+            <div class="live-status"><i class="pulse"></i><div><strong>Current stage: departure preparation; flights, stays and core ground transport confirmed</strong><span>Seven flight segments, the Montreal and Detroit stays, Detroit rental, and the Bilbao stay are confirmed. Canada entry documents are cleared and ArriveCAN is submitted; Taipei airport transfer, U.S. ESTA approval and the 18 Sep rental return need final confirmation.</span></div></div>
             <div class="phase-legend" aria-label="Route phase legend"><span><i></i>Company</span><span><i class="orange"></i>Private</span><span><i class="gray"></i>Return</span></div>
           </div>
         </div>
@@ -499,12 +514,13 @@
           <p class="section-kicker" id="attention-title">Needs attention</p>
           <ol class="attention-list">
             <li><span class="attention-icon">!</span><span class="attention-copy"><strong>Confirm baggage allowance with airlines</strong><span>Issued receipts do not state the allowance; verify it before departure.</span></span><span class="status verify">Verify</span></li>
-            <li><span class="attention-icon">!</span><span class="attention-copy"><strong>Protect the Montreal cancellation deadline</strong><span>Free until 9 Sep at 23:59 Montreal time; late cancellation may cost CAD 157 plus taxes/fees.</span></span><span class="status verify">9 Sep</span></li>
-            <li><span class="attention-icon">!</span><span class="attention-copy"><strong>Protect the Bilbao cancellation deadline</strong><span>Free until 19 Sep at 18:00 hotel time; late cancellation costs one night.</span></span><span class="status verify">19 Sep</span></li>
-            <li><span class="attention-icon">!</span><span class="attention-copy"><strong>Confirm Westin funding treatment</strong><span>The room is confirmed for the conference stay; reimbursement treatment remains TBD.</span></span><span class="status verify">Verify</span></li>
-            <li><span class="attention-icon">!</span><span class="attention-copy"><strong>Select an industry tour</strong><span>RSVP is required; UL NAABL is limited to 20 people.</span></span><span class="status verify">RSVP</span></li>
-            <li><span class="attention-icon">!</span><span class="attention-copy"><strong>Complete the Bilbao work and transfer plan</strong><span>Add the worksite, contacts, meeting dates and BIO→BCN plan.</span></span><span class="status waiting">Open</span></li>
-            <li><span class="attention-icon">!</span><span class="attention-copy"><strong>Check entry documents</strong><span>Passport, U.S. ESTA, Canada eTA, insurance and company approvals.</span></span><span class="status verify">Verify</span></li>
+            <li><span class="attention-icon">!</span><span class="attention-copy"><strong>Confirm Taipei airport transfer</strong><span>A request was sent on 8 Sep; confirm the driver, pickup time and meeting point.</span></span><span class="status verify">Action</span></li>
+            <li><span class="attention-icon">!</span><span class="attention-copy"><strong>Confirm U.S. ESTA approval</strong><span>An ESTA application was submitted on 7 Sep. Before departure, verify the official status is “Authorization Approved”.</span></span><span class="status verify">Verify</span></li>
+            <li><span class="attention-icon">!</span><span class="attention-copy"><strong>Prepare presentation delivery</strong><span>Organizer email lists your slot as 10:20–10:40 Eastern on 15 Sep. Arrive 10–15 minutes early with a USB copy, then confirm the final room and order in the app.</span></span><span class="status verify">15 Sep</span></li>
+            <li><span class="attention-icon">!</span><span class="attention-copy"><strong>Verify ASME Conference App access</strong><span>The activation window noted in the 4 Sep email has passed; confirm your profile is active and use the app for the live agenda and attendee information.</span></span><span class="status verify">Action</span></li>
+            <li><span class="attention-icon">!</span><span class="attention-copy"><strong>Choose an industry tour</strong><span>Advanced registration is required; tours overlap, so select one.</span></span><span class="status verify">RSVP</span></li>
+            <li><span class="attention-icon">!</span><span class="attention-copy"><strong>Return Hertz early on 18 Sep</strong><span>Current return is 15:00 at DTW; LH443 departs at 16:00. Arrange an earlier return.</span></span><span class="status verify">Action</span></li>
+            <li><span class="attention-icon">!</span><span class="attention-copy"><strong>Complete the Spain extension plan</strong><span>After 22 Sep, confirm transport and accommodation for Madrid and Barcelona.</span></span><span class="status waiting">Open</span></li>
           </ol>
         </aside>
       </section>
@@ -513,19 +529,19 @@
       <section class="content-section" id="flights">
         <div class="section-heading">
           <h2>Selected flights</h2>
-          <p>Times are local. “Ticketed” means an e-ticket receipt was issued on 4 Aug. Baggage shown comes from Celine’s CWT quote; the receipts say “not specified”, so verify it with the airlines.</p>
+          <p>Times are local. “Ticketed” means an e-ticket receipt was issued on 4 Aug. The current e-tickets do not state a free baggage allowance for these flights; confirm directly with each carrier before departure.</p>
         </div>
         <div class="table-wrap">
           <table>
             <thead><tr><th>Date</th><th>From</th><th>To</th><th>Local time</th><th>Flight</th><th>Cabin</th><th>Baggage</th><th>Status</th></tr></thead>
             <tbody>
-              <tr><td>Thu · 10 Sep</td><td class="airport"><strong>TPE</strong><span>Taipei · Terminal 2</span></td><td class="airport"><strong>NRT</strong><span>Tokyo · Terminal 2</span></td><td><span class="time">10:25 → 14:55</span><br><span class="small-muted">3h 30m</span></td><td><span class="flight-number">JL802</span><br><span class="small-muted">Japan Airlines</span></td><td>Economy S</td><td>2 × 23 kg</td><td><span class="status approved">Ticketed</span></td></tr>
-              <tr><td>Thu · 10 Sep</td><td class="airport"><strong>NRT</strong><span>Tokyo · Terminal 1</span></td><td class="airport"><strong>YUL</strong><span>Montreal</span></td><td><span class="time">17:50 → 17:00</span><br><span class="small-muted">12h 10m · same date</span></td><td><span class="flight-number">AC006</span><br><span class="small-muted">Air Canada</span></td><td>Premium Economy A</td><td>2 × 23 kg</td><td><span class="status approved">Ticketed</span></td></tr>
-              <tr><td>Sun · 13 Sep</td><td class="airport"><strong>YUL</strong><span>Montreal · Terminal 2</span></td><td class="airport"><strong>DTW</strong><span>Detroit · Terminal E</span></td><td><span class="time">19:30 → 21:29</span><br><span class="small-muted">1h 59m</span></td><td><span class="flight-number">AC8583</span><br><span class="small-muted">Air Canada</span></td><td>Economy B</td><td>2 × 23 kg</td><td><span class="status approved">Ticketed</span></td></tr>
-              <tr><td>Fri · 18 Sep</td><td class="airport"><strong>DTW</strong><span>Detroit · Terminal E</span></td><td class="airport"><strong>FRA</strong><span>Frankfurt · Terminal 1</span></td><td><span class="time">16:00 → 05:45 +1</span><br><span class="small-muted">7h 45m</span></td><td><span class="flight-number">LH443</span><br><span class="small-muted">Lufthansa</span></td><td>Economy S</td><td>1 × 23 kg</td><td><span class="status approved">Ticketed</span></td></tr>
-              <tr><td>Sat · 19 Sep</td><td class="airport"><strong>FRA</strong><span>Frankfurt · Terminal 1</span></td><td class="airport"><strong>BIO</strong><span>Bilbao</span></td><td><span class="time">10:50 → 13:00</span><br><span class="small-muted">2h 10m</span></td><td><span class="flight-number">LH1142</span><br><span class="small-muted">Lufthansa</span></td><td>Economy S</td><td>1 × 23 kg</td><td><span class="status approved">Ticketed</span></td></tr>
-              <tr><td>Sat · 10 Oct</td><td class="airport"><strong>BCN</strong><span>Barcelona · Terminal 2</span></td><td class="airport"><strong>HKG</strong><span>Hong Kong · Terminal 1</span></td><td><span class="time">13:00 → 07:00 +1</span><br><span class="small-muted">12h</span></td><td><span class="flight-number">CX318</span><br><span class="small-muted">Cathay Pacific</span></td><td>Economy B</td><td>2 × 23 kg</td><td><span class="status approved">Ticketed</span></td></tr>
-              <tr><td>Sun · 11 Oct</td><td class="airport"><strong>HKG</strong><span>Hong Kong · Terminal 1</span></td><td class="airport"><strong>KHH</strong><span>Kaohsiung · Terminal I</span></td><td><span class="time">08:35 → 10:10</span><br><span class="small-muted">1h 35m</span></td><td><span class="flight-number">CX432</span><br><span class="small-muted">Cathay Pacific</span></td><td>Economy B</td><td>2 × 23 kg</td><td><span class="status approved">Ticketed</span></td></tr>
+              <tr><td>Thu · 10 Sep</td><td class="airport"><strong>TPE</strong><span>Taipei · Terminal 2</span></td><td class="airport"><strong>NRT</strong><span>Tokyo · Terminal 2</span></td><td><span class="time">10:25 → 14:55</span><br><span class="small-muted">3h 30m</span></td><td><span class="flight-number">JL802</span><br><span class="small-muted">Japan Airlines</span></td><td>Economy S</td><td>Not stated</td><td><span class="status approved">Ticketed</span></td></tr>
+              <tr><td>Thu · 10 Sep</td><td class="airport"><strong>NRT</strong><span>Tokyo · Terminal 1</span></td><td class="airport"><strong>YUL</strong><span>Montreal</span></td><td><span class="time">17:50 → 17:00</span><br><span class="small-muted">12h 10m · same date</span></td><td><span class="flight-number">AC006</span><br><span class="small-muted">Air Canada</span></td><td>Premium Economy A</td><td>Not stated</td><td><span class="status approved">Ticketed</span></td></tr>
+              <tr><td>Sun · 13 Sep</td><td class="airport"><strong>YUL</strong><span>Montreal · Terminal 2</span></td><td class="airport"><strong>DTW</strong><span>Detroit · Terminal E</span></td><td><span class="time">19:30 → 21:29</span><br><span class="small-muted">1h 59m</span></td><td><span class="flight-number">AC8583</span><br><span class="small-muted">Air Canada</span></td><td>Economy B</td><td>Not stated</td><td><span class="status approved">Ticketed</span></td></tr>
+              <tr><td>Fri · 18 Sep</td><td class="airport"><strong>DTW</strong><span>Detroit · Terminal E</span></td><td class="airport"><strong>FRA</strong><span>Frankfurt · Terminal 1</span></td><td><span class="time">16:00 → 05:45 +1</span><br><span class="small-muted">7h 45m</span></td><td><span class="flight-number">LH443</span><br><span class="small-muted">Lufthansa</span></td><td>Economy S</td><td>Not stated</td><td><span class="status approved">Ticketed</span></td></tr>
+              <tr><td>Sat · 19 Sep</td><td class="airport"><strong>FRA</strong><span>Frankfurt · Terminal 1</span></td><td class="airport"><strong>BIO</strong><span>Bilbao</span></td><td><span class="time">10:50 → 13:00</span><br><span class="small-muted">2h 10m</span></td><td><span class="flight-number">LH1142</span><br><span class="small-muted">Lufthansa</span></td><td>Economy S</td><td>Not stated</td><td><span class="status approved">Ticketed</span></td></tr>
+              <tr><td>Sat · 10 Oct</td><td class="airport"><strong>BCN</strong><span>Barcelona · Terminal 2</span></td><td class="airport"><strong>HKG</strong><span>Hong Kong · Terminal 1</span></td><td><span class="time">13:00 → 07:00 +1</span><br><span class="small-muted">12h</span></td><td><span class="flight-number">CX318</span><br><span class="small-muted">Cathay Pacific</span></td><td>Economy B</td><td>Not stated</td><td><span class="status approved">Ticketed</span></td></tr>
+              <tr><td>Sun · 11 Oct</td><td class="airport"><strong>HKG</strong><span>Hong Kong · Terminal 1</span></td><td class="airport"><strong>KHH</strong><span>Kaohsiung · Terminal I</span></td><td><span class="time">08:35 → 10:10</span><br><span class="small-muted">1h 35m</span></td><td><span class="flight-number">CX432</span><br><span class="small-muted">Cathay Pacific</span></td><td>Economy B</td><td>Not stated</td><td><span class="status approved">Ticketed</span></td></tr>
             </tbody>
           </table>
           <div class="travel-note">○ All seven flight segments were ticketed on 4 Aug. The return is confirmed to KHH on 11 Oct. Keep the e-ticket receipts as the final authority.</div>
@@ -543,8 +559,8 @@
                 <h3>Montreal <span class="dates">10–13 Sep · 3 nights</span></h3>
                 <p><strong>Confirmed hotel:</strong> Hampton Inn &amp; Suites by Hilton Montreal-Dorval.</p>
                 <address>1900 Trans-Canada Highway, Dorval, QC H9P 2N4, Canada</address>
-                <p>Breakfast is included. Accessible non-smoking king room. CWT total: CAD 560.49 (CAD 471 rooms + CAD 89.49 taxes/fees).</p>
-                <p><strong>Cancellation:</strong> free until 9 Sep at 23:59 Montreal time; later cancellation may cost CAD 157 plus taxes/fees.</p>
+                <p>Breakfast is included. Accessible non-smoking king room.</p>
+                <p>Keep the issued confirmation available; it shows a 9 Sep cancellation deadline.</p>
                 <div class="link-row"><a class="text-link" href="https://www.hilton.com/en/hotels/yuldvhx-hampton-suites-montreal-dorval/" target="_blank" rel="noopener">Official hotel ↗</a><a class="text-link" href="https://www.google.com/maps/search/?api=1&amp;query=1900+Trans-Canada+Highway+Dorval+QC+H9P+2N4" target="_blank" rel="noopener">Map ↗</a><a class="text-link" href="https://www.google.com/maps/dir/?api=1&amp;origin=Montreal-Pierre+Elliott+Trudeau+International+Airport&amp;destination=1900+Trans-Canada+Highway+Dorval+QC+H9P+2N4" target="_blank" rel="noopener">Airport route ↗</a></div>
               </div>
               <span class="status approved">Confirmed</span>
@@ -554,9 +570,9 @@
               <div class="timeline-pin"><i></i></div>
               <div class="stay-copy">
                 <h3>Detroit / Southfield <span class="dates">13–18 Sep</span></h3>
-                <p><strong>Conference venue and confirmed hotel:</strong> The Westin Southfield Detroit stay for 13–18 Sep is confirmed. Reimbursement treatment remains TBD.</p>
+                <p><strong>Conference venue and confirmed hotel:</strong> The Westin Southfield Detroit stay for 13–18 Sep is confirmed.</p>
                 <address>1500 Town Center, Southfield, MI 48075, USA</address>
-                <p>Arrive DTW at 21:29 on 13 Sep. The hotel is 22 miles from DTW and does not run an airport shuttle. Use an official rideshare, taxi or pre-booked MetroCars; the hotel lists MetroCars at USD 59 one-way.</p>
+                <p>Arrive DTW at 21:29 on 13 Sep. The Detroit airport rental is confirmed through 18 Sep at 15:00; arrange an earlier return for the 16:00 flight.</p>
                 <div class="link-row"><a class="text-link" href="https://www.marriott.com/en-us/hotels/dtwwi-the-westin-southfield-detroit/overview/" target="_blank" rel="noopener">Official hotel ↗</a><a class="text-link" href="https://www.google.com/maps/dir/?api=1&amp;origin=Detroit+Metropolitan+Wayne+County+Airport&amp;destination=The+Westin+Southfield+Detroit" target="_blank" rel="noopener">Airport route ↗</a><a class="text-link" href="https://www.google.com/maps/search/?api=1&amp;query=The+Westin+Southfield+Detroit" target="_blank" rel="noopener">Map ↗</a></div>
               </div>
               <span class="status approved">Confirmed</span>
@@ -565,16 +581,11 @@
             <article class="stay-row">
               <div class="timeline-pin"><i></i></div>
               <div class="stay-copy">
-                <h3>Bilbao <span class="dates">19–23 Sep · 4 nights</span></h3>
-                <p><strong>Original CWT confirmation:</strong> NH La Avanzada.</p>
-                <p><strong>Current status:</strong> James requested cancellation on 13 Aug. CWT has not confirmed the outcome, so the stay and its funding treatment are TBD.</p>
-                <address>Paseo Landabarri 5, 48940 Leioa-Getxo, Bilbao, Spain</address>
-                <p>Breakfast is included. CWT total: EUR 608.72 (EUR 553.38 rooms + EUR 55.34 taxes/fees).</p>
-                <p><strong>Cancellation:</strong> free until 19 Sep at 18:00 hotel time; later cancellation costs one night.</p>
-                <p>Celine selected the lower-cost option: NH Bilbao Deusto averaged about EUR 183 per night, versus the UL Spain BCN contracted range of about EUR 120–155.</p>
-                <div class="link-row"><a class="text-link" href="https://www.nh-hotels.com/en/hotel/nh-la-avanzada" target="_blank" rel="noopener">Official hotel ↗</a><a class="text-link" href="https://www.google.com/maps/search/?api=1&amp;query=NH+La+Avanzada+Paseo+Landabarri+5+Leioa" target="_blank" rel="noopener">Map ↗</a><a class="text-link" href="https://www.google.com/maps/dir/?api=1&amp;origin=Bilbao+Airport&amp;destination=NH+La+Avanzada+Leioa" target="_blank" rel="noopener">Airport route ↗</a></div>
+                <h3>Bilbao <span class="dates">19–22 Sep · 3 nights</span></h3>
+                <p><strong>Confirmed lodging:</strong> 19–22 Sep.</p>
+                <p>The former CWT booking was cancelled on 14 Aug. Keep the current lodging confirmation private.</p>
               </div>
-              <span class="status verify">Cancellation outcome TBD</span>
+              <span class="status approved">Confirmed</span>
             </article>
 
             <article class="stay-row self">
@@ -591,10 +602,9 @@
           <aside class="panel decision-log">
             <h3>Conversation decision log</h3>
             <ul>
-              <li><strong>Montreal:</strong> Hampton Montreal-Dorval is confirmed for three nights with breakfast; the CWT total is CAD 560.49.</li>
-              <li><strong>Bilbao:</strong> Celine booked NH La Avanzada as the lower-cost corporate option; four nights with breakfast total EUR 608.72.</li>
-              <li><strong>Detroit arrival:</strong> go directly from DTW to Southfield by car; avoid a long late-night public-transit journey with luggage.</li>
-              <li><strong>Accounting:</strong> trip marked Non-Billable. BIO→Taiwan remains the company-return benchmark; private extension details need final policy handling.</li>
+              <li><strong>Montreal:</strong> Hampton Montreal-Dorval is confirmed for three nights with breakfast.</li>
+              <li><strong>Bilbao:</strong> lodging is confirmed for 19–22 Sep; the former CWT booking was cancelled on 14 Aug.</li>
+              <li><strong>Detroit arrival:</strong> CWT confirms a five-day Detroit airport rental; drive directly to Southfield after the late arrival.</li>
               <li><strong>Privacy:</strong> ticket numbers, booking references, phone numbers and personal email addresses are intentionally excluded here.</li>
             </ul>
             <details><summary>Dismissed / older options</summary><ul><li>Los Angeles and Tokyo/Delta routings were rejected in favor of Montreal.</li><li>Premium Economy DTW→FRA was rejected because the quoted personal fare difference was disproportionate.</li><li>The 17 Sep Detroit departure was moved to 18 Sep so the industry tour can be attended.</li></ul></details>
@@ -616,9 +626,9 @@
 
           <div class="agenda">
             <article class="agenda-day"><div class="agenda-date"><strong>14</strong>Monday</div><div class="agenda-copy"><h3>Arrival rhythm & conference opening</h3><p>Registration 13:00–18:00. Welcome reception and technical poster session 17:30–19:00. Use the morning to recover, work and prepare.</p></div></article>
-            <article class="agenda-day"><div class="agenda-date"><strong>15</strong>Tuesday</div><div class="agenda-copy"><h3>Full conference day</h3><p>Registration from 07:00; keynote, technical sessions, networking and the evening honors/awards program. Check the live technical-session schedule for your priority talks.</p></div></article>
+            <article class="agenda-day"><div class="agenda-date"><strong>15</strong>Tuesday</div><div class="agenda-copy"><h3>Organizer’s scheduled slot · 10:20–10:40 Eastern</h3><p>Present “Leakage-Aware Modeling for Lithium-Ion Battery Degradation Forecasting” in Session 12-04: Battery Degradation and Thermal Management. The live session page shows a 09:20–11:20 window and notes that presentation timing can shift; confirm the room and order in the ASME Conferences App. <a class="text-link" href="https://drivn.secure-platform.com/a/solicitations/284/sessiongallery/schedule/items/24315" target="_blank" rel="noopener">Official session schedule ↗</a></p></div></article>
             <article class="agenda-day"><div class="agenda-date"><strong>16</strong>Wednesday</div><div class="agenda-copy"><h3>Full conference day</h3><p>Keynote, technical sessions and panels, including future powertrain development and scaling ADAS/autonomous mobility.</p></div></article>
-            <article class="agenda-day"><div class="agenda-date"><strong>17</strong>Thursday</div><div class="agenda-copy"><h3>Select one industry tour · transportation from hotel provided</h3><p>RSVP required. Tour times include travel.</p><div class="tour-options"><div class="tour"><strong>UL Solutions NAABL</strong><span>09:15 · 4h · Auburn Hills · capacity 20 · NDA + lunch</span></div><div class="tour"><strong>Mcity / EV Center</strong><span>08:30 · 3h · Ann Arbor · capacity 40</span></div><div class="tour"><strong>GM Performance Center</strong><span>09:00 · 1.5h · Pontiac · capacity 60</span></div></div><div class="link-row"><a class="text-link" href="https://event.asme.org/DRIVN/Program/Industry-Tours" target="_blank" rel="noopener">Official tour details & RSVP ↗</a></div></div></article>
+            <article class="agenda-day"><div class="agenda-date"><strong>17</strong>Thursday</div><div class="agenda-copy"><h3>Select one industry tour · transportation provided</h3><p>Advanced registration is required. Only choose one: schedules overlap.</p><div class="tour-options"><div class="tour"><strong>UL Solutions NAABL</strong><span>10:00 pick-up · 10:45–14:45 · Auburn Hills · NDA + lunch</span></div><div class="tour"><strong>Mcity / EV Center</strong><span>08:00 hotel pick-up · 09:00–11:00 · Ann Arbor · capacity 40</span></div><div class="tour"><strong>GM Performance Center</strong><span>09:00 · 1.5h · Pontiac · capacity 60</span></div></div><div class="link-row"><a class="text-link" href="https://event.asme.org/DRIVN/Program/Industry-Tours" target="_blank" rel="noopener">Official tour details & RSVP ↗</a></div></div></article>
           </div>
         </div>
       </section>
@@ -631,13 +641,13 @@
           <article class="plan-row"><div class="plan-date">12 Sep</div><div class="plan-day">Sat</div><div class="plan-copy"><strong>Montreal day</strong><span>Flexible city day. Pack and check AC8583 status in the evening.</span></div><span class="status verify">Cost treatment</span></article>
           <article class="plan-row"><div class="plan-date">13 Sep</div><div class="plan-day">Sun</div><div class="plan-copy"><strong>Montreal → Detroit</strong><span>19:30 flight. Allow extra time for U.S. pre-clearance. After 21:29 arrival, take a car directly to Westin Southfield.</span></div><span class="status approved">Company</span></article>
           <article class="plan-row"><div class="plan-date">14 Sep</div><div class="plan-day">Mon</div><div class="plan-copy"><strong>Conference opening</strong><span>Morning recovery/prep; registration 13:00; welcome reception 17:30.</span></div><span class="status approved">Company</span></article>
-          <article class="plan-row"><div class="plan-date">15 Sep</div><div class="plan-day">Tue</div><div class="plan-copy"><strong>ASME DRIVN · full day</strong><span>Prioritize battery safety, electrification, hybrid mobility and networking.</span></div><span class="status approved">Company</span></article>
+          <article class="plan-row"><div class="plan-date">15 Sep</div><div class="plan-day">Tue</div><div class="plan-copy"><strong>ASME DRIVN presentation · 10:20–10:40 Eastern</strong><span>Organizer email lists this slot for “Leakage-Aware Modeling for Lithium-Ion Battery Degradation Forecasting.” Arrive 10–15 minutes early with a USB copy; confirm the room and order in the app.</span></div><span class="status approved">Company</span></article>
           <article class="plan-row"><div class="plan-date">16 Sep</div><div class="plan-day">Wed</div><div class="plan-copy"><strong>ASME DRIVN · full day</strong><span>Keynotes, technical sessions and panels. Confirm tour meeting point before sleep.</span></div><span class="status approved">Company</span></article>
           <article class="plan-row"><div class="plan-date">17 Sep</div><div class="plan-day">Thu</div><div class="plan-copy"><strong>Industry tour</strong><span>Select and RSVP. Return to hotel, reorganize luggage and prepare for Europe.</span></div><span class="status verify">RSVP</span></article>
-          <article class="plan-row"><div class="plan-date">18 Sep</div><div class="plan-day">Fri</div><div class="plan-copy"><strong>Detroit → Frankfurt</strong><span>Hotel checkout by 12:00. LH443 departs 16:00.</span></div><span class="status approved">Company</span></article>
-          <article class="plan-row"><div class="plan-date">19 Sep</div><div class="plan-day">Sat</div><div class="plan-copy"><strong>Frankfurt → Bilbao</strong><span>Arrive BIO 13:00. Check in at NH La Avanzada, eat and recover.</span></div><span class="status approved">Company</span></article>
+          <article class="plan-row"><div class="plan-date">18 Sep</div><div class="plan-day">Fri</div><div class="plan-copy"><strong>Detroit → Frankfurt</strong><span>Hotel checkout by 12:00. Return the Hertz rental early enough for LH443 at 16:00.</span></div><span class="status verify">Verify</span></article>
+          <article class="plan-row"><div class="plan-date">19 Sep</div><div class="plan-day">Sat</div><div class="plan-copy"><strong>Frankfurt → Bilbao</strong><span>Arrive BIO 13:00. Check in to confirmed lodging, eat and recover.</span></div><span class="status approved">Company</span></article>
           <article class="plan-row"><div class="plan-date">20 Sep</div><div class="plan-day">Sun</div><div class="plan-copy"><strong>Bilbao reset day</strong><span>Prepare for the work week; confirm office route and meeting plan.</span></div><span class="status waiting">Details open</span></article>
-          <article class="plan-row"><div class="plan-date">21 Sep+</div><div class="plan-day">Week</div><div class="plan-copy"><strong>Bilbao business</strong><span>Add the worksite address, meeting owners and confirmed end date.</span></div><span class="status waiting">Details open</span></article>
+          <article class="plan-row"><div class="plan-date">21 Sep+</div><div class="plan-day">Week</div><div class="plan-copy"><strong>Bilbao work & onward planning</strong><span>Confirmed lodging ends 22 Sep. Add the worksite details, then confirm onward transport and accommodation.</span></div><span class="status waiting">Details open</span></article>
           <article class="plan-row"><div class="plan-date">Late Sep</div><div class="plan-day">TBD</div><div class="plan-copy"><strong>Bilbao → Barcelona</strong><span>Self-arranged; choose date, flight/train and baggage plan.</span></div><span class="status self">Private</span></article>
           <article class="plan-row"><div class="plan-date">10–11 Oct</div><div class="plan-day">Sat–Sun</div><div class="plan-copy"><strong>Barcelona → Hong Kong → Kaohsiung</strong><span>13:00 departure; 10:10 arrival next day. The issued e-ticket confirms KHH.</span></div><span class="status private">Return</span></article>
         </div>
@@ -648,30 +658,52 @@
         <div class="notes-grid">
           <div class="panel notes-card">
             <h3>Private notes on this device</h3>
+            <details class="document-wallet" id="documentWallet">
+              <summary>Private travel-document wallet</summary>
+              <div class="document-wallet-inner">
+                <p class="document-wallet-note">Stored only on this device. It is excluded from sharing and printing.</p>
+                <div class="document-wallet-grid">
+                  <section class="document-entry" aria-labelledby="etaWalletHeading">
+                    <h4 id="etaWalletHeading">Canada eTA</h4>
+                    <label>eTA number<input id="etaNumber" type="text" autocomplete="off" spellcheck="false"></label>
+                    <label>Source email link<input id="etaEmailUrl" type="url" autocomplete="off" spellcheck="false" placeholder="https://mail.google.com/..."></label>
+                    <a class="document-email-link" id="etaOpenEmail" target="_blank" rel="noopener" hidden>Open source email ↗</a>
+                  </section>
+                  <section class="document-entry" aria-labelledby="estaWalletHeading">
+                    <h4 id="estaWalletHeading">U.S. ESTA</h4>
+                    <label>Application number<input id="estaNumber" type="text" autocomplete="off" spellcheck="false"></label>
+                    <label>Source email link<input id="estaEmailUrl" type="url" autocomplete="off" spellcheck="false" placeholder="https://mail.google.com/..."></label>
+                    <a class="document-email-link" id="estaOpenEmail" target="_blank" rel="noopener" hidden>Open source email ↗</a>
+                  </section>
+                </div>
+                <div class="document-wallet-actions"><span class="document-wallet-state" id="documentWalletState" data-no-translate>Not saved</span></div>
+              </div>
+            </details>
             <textarea id="tripNotes" maxlength="3000" placeholder="Add room numbers, meeting points or coordination notes here. Avoid storing passport or credit-card details."></textarea>
             <div class="autosave"><span id="saveState" data-no-translate>Saved locally</span><span><span id="noteCount">0</span> / 3000</span></div>
             <div class="checklist" id="checklist">
               <h3>Next actions</h3>
               <label><input type="checkbox" data-key="tickets"><span>Review and save every issued e-ticket; confirm names, dates and baggage directly with the airlines.</span></label>
-              <label><input type="checkbox" data-key="montreal-hampton"><span>Save the Hampton confirmation and protect the 9 Sep cancellation deadline.</span></label>
-              <label><input type="checkbox" data-key="detroit"><span>Keep the Westin confirmation private; confirm a late-arrival note if needed.</span></label>
-              <label><input type="checkbox" data-key="tour"><span>Register for ASME DRIVN and RSVP for one industry tour.</span></label>
-              <label><input type="checkbox" data-key="bilbao-avanzada"><span>Save the NH La Avanzada confirmation; add the worksite, contacts and meeting dates.</span></label>
-              <label><input type="checkbox" data-key="spain"><span>Book BIO→BCN and Barcelona stay.</span></label>
-              <label><input type="checkbox" data-key="documents"><span>Check passport, U.S. ESTA, Canada eTA, insurance and company approvals.</span></label>
+              <label><input type="checkbox" data-key="montreal-hampton"><span>Confirm Taipei airport transfer: driver, pickup time and meeting point.</span></label>
+              <label><input type="checkbox" data-key="detroit"><span>Arrange an earlier Hertz return on 18 Sep for the 16:00 LH443 departure.</span></label>
+              <label><input type="checkbox" data-key="presentation"><span>Pack a USB copy of the DRIVN presentation and arrive by 10:05 Eastern on 15 Sep.</span></label>
+              <label><input type="checkbox" data-key="tour"><span>Verify ASME Conference App access, confirm your session room, and RSVP for one industry tour.</span></label>
+              <label><input type="checkbox" data-key="bilbao-avanzada"><span>Save the current Bilbao lodging confirmation; check out on 22 Sep.</span></label>
+              <label><input type="checkbox" data-key="spain"><span>Confirm transport and accommodation after 22 Sep, including Madrid and Barcelona.</span></label>
+              <label><input type="checkbox" data-key="documents"><span>Verify U.S. ESTA approval; carry your passport, Canadian entry document and ArriveCAN declaration.</span></label>
             </div>
           </div>
 
           <aside class="panel source-card">
             <h3>Source hierarchy</h3>
             <ul class="source-list">
-              <li><a href="#flights">Celine / CWT conversation and issued confirmations</a><span>The 4 Aug receipts confirm all seven flight segments; the 6 Aug confirmations add the Montreal and Bilbao hotels. Issued documents remain final authority.</span></li>
+              <li><a href="#flights">Celine / CWT conversation and issued confirmations</a><span>The 4 Aug receipts confirm all seven flight segments; the 6 Aug confirmations cover the Montreal and former Bilbao hotel bookings. The former Bilbao booking was later cancelled. Issued documents remain final authority.</span></li>
               <li><a href="https://event.asme.org/DRIVN" target="_blank" rel="noopener">ASME DRIVN 2026 official site ↗</a><span>Venue, conference dates, registration and live program.</span></li>
+              <li><a href="https://drivn.secure-platform.com/a/solicitations/284/sessiongallery/schedule/items/24315" target="_blank" rel="noopener">ASME presentation session ↗</a><span>Tuesday 15 September, 09:20–11:20 Eastern · Battery Degradation and Thermal Management; use the app for the final room and run order.</span></li>
               <li><a href="https://event.asme.org/DRIVN/Program/Schedule-at-a-Glance" target="_blank" rel="noopener">ASME schedule at a glance ↗</a><span>Daily event rhythm and Eastern Time schedule.</span></li>
               <li><a href="https://event.asme.org/DRIVN/Program/Industry-Tours" target="_blank" rel="noopener">ASME industry tours ↗</a><span>Tour start times, capacity, locations and RSVP details.</span></li>
               <li><a href="https://www.marriott.com/en-us/hotels/dtwwi-the-westin-southfield-detroit/overview/" target="_blank" rel="noopener">Westin Southfield official site ↗</a><span>Address, check-in/out, DTW distance and ground-transport information.</span></li>
               <li><a href="https://www.hilton.com/en/hotels/yuldvhx-hampton-suites-montreal-dorval/" target="_blank" rel="noopener">Hampton Montreal-Dorval official site ↗</a><span>Official property address and hotel information.</span></li>
-              <li><a href="https://www.nh-hotels.com/en/hotel/nh-la-avanzada" target="_blank" rel="noopener">NH La Avanzada official site ↗</a><span>Official property address and location information.</span></li>
             </ul>
             <div class="privacy-note"><strong>Share-safe by design.</strong> This copy excludes booking references, ticket numbers, payment data, private email addresses and personal phone numbers. Do not add those before publishing publicly.</div>
           </aside>
@@ -921,7 +953,6 @@
         "Current stage: tickets issued · hotels pending": "目前階段：機票已開立 · 住宿待確認",
         "Seven flight segments are ticketed; accommodation confirmations and baggage verification are still needed.": "七段航班皆已開票；仍需確認住宿與行李額度。",
         "Current stage: flights ticketed; Detroit stay confirmed; Bilbao lodging under verification": "目前階段：航班已開票；底特律住宿已確認；畢爾包住宿待核實",
-        "Seven flight segments, the Montreal stay, and the Detroit conference stay are confirmed. CWT has not confirmed the outcome of James’s 13 Aug Bilbao hotel-cancellation request; funding treatment remains TBD.": "七段航班、蒙特婁住宿及底特律大會住宿已確認。CWT 尚未確認 James 於 8 月 13 日提出的畢爾包飯店取消結果；經費處理仍待確認。",
         "Route phase legend": "旅程階段圖例",
         "Company": "公務",
         "Private": "私人",
@@ -937,11 +968,9 @@
         "Fix myCWT profile access": "處理 myCWT 帳戶存取",
         "Email mismatch blocks the credit-card hotel guarantee.": "電子郵件不相符，導致無法用信用卡擔保住宿。",
         "Protect the Montreal cancellation deadline": "留意蒙特婁住宿取消期限",
-        "Free until 9 Sep at 23:59 Montreal time; late cancellation may cost CAD 157 plus taxes/fees.": "可於蒙特婁時間 9 月 9 日 23:59 前免費取消；逾期可能收取 CAD 157 加稅費。",
         "Protect the Bilbao cancellation deadline": "留意畢爾包住宿取消期限",
         "Free until 19 Sep at 18:00 hotel time; late cancellation costs one night.": "可於飯店當地時間 9 月 19 日 18:00 前免費取消；逾期收取一晚房費。",
         "Confirm Westin funding treatment": "確認 Westin 經費處理",
-        "The room is confirmed for the conference stay; reimbursement treatment remains TBD.": "大會住宿客房已確認；核銷處理仍待確認。",
         "Verify": "待確認",
         "Select an industry tour": "選擇產業參訪",
         "RSVP is required; UL NAABL is limited to 20 people.": "必須事先 RSVP；UL NAABL 名額上限為 20 人。",
@@ -1006,15 +1035,12 @@
         "19–23 Sep · 4 nights": "9 月 19–23 日 · 4 晚",
         "Decision:": "決定：",
         "ask Celine for a suitable city-centre corporate-rate hotel. If none fits policy, book the Days Inn fallback.": "請 Celine 尋找合適的市中心企業價住宿；若沒有符合政策的選項，則預訂 Days Inn 備案。",
-        "Fallback quote in the conversation: CAD 570.73 estimated total, including mandatory taxes/fees; continental breakfast listed. Live transit should be checked before each outing.": "對話中的備案報價估計總額為 CAD 570.73，已含必要稅費，並列有歐陸式早餐。每次外出前請即時查詢交通。",
         "Official hotel ↗": "飯店官網 ↗",
         "Map ↗": "地圖 ↗",
         "To Old Montreal ↗": "前往蒙特婁老城 ↗",
         "Awaiting Celine": "等待 Celine",
         "Original CWT confirmation:": "原始 CWT 確認：",
-        "Breakfast is included. Accessible non-smoking king room. CWT total: CAD 560.49 (CAD 471 rooms + CAD 89.49 taxes/fees).": "含早餐，無障礙禁菸特大床房。CWT 總額為 CAD 560.49（房費 CAD 471，稅費 CAD 89.49）。",
         "Cancellation:": "取消條款：",
-        "free until 9 Sep at 23:59 Montreal time; later cancellation may cost CAD 157 plus taxes/fees.": "可於蒙特婁時間 9 月 9 日 23:59 前免費取消；逾期可能收取 CAD 157 加稅費。",
         "Cancellation outcome TBD": "取消結果待確認",
         "Confirmed": "已確認",
         "Detroit / Southfield": "底特律／Southfield",
@@ -1029,9 +1055,7 @@
         "Bilbao map ↗": "畢爾包地圖 ↗",
         "Current status:": "目前狀態：",
         "James requested cancellation on 13 Aug. CWT has not confirmed the outcome, so the stay and its funding treatment are TBD.": "James 已於 8 月 13 日要求取消。CWT 尚未確認結果，因此住宿與經費處理均為待確認。",
-        "Breakfast is included. CWT total: EUR 608.72 (EUR 553.38 rooms + EUR 55.34 taxes/fees).": "含早餐。CWT 總額為 EUR 608.72（房費 EUR 553.38，稅費 EUR 55.34）。",
         "free until 19 Sep at 18:00 hotel time; later cancellation costs one night.": "可於飯店當地時間 9 月 19 日 18:00 前免費取消；逾期收取一晚房費。",
-        "Celine selected the lower-cost option: NH Bilbao Deusto averaged about EUR 183 per night, versus the UL Spain BCN contracted range of about EUR 120–155.": "Celine 選擇價格較低的方案；NH Bilbao Deusto 平均每晚約 EUR 183，而 UL 西班牙 BCN 合約房價約為 EUR 120–155。",
         "after Bilbao → 10 Oct": "畢爾包之後 → 10 月 10 日",
         "BIO→BCN and the Barcelona stay are self-arranged. Add the travel date, property and contact plan when chosen.": "BIO→BCN 與巴塞隆納住宿為自行安排。確定後補上日期、住宿與聯絡方案。",
         "Open Google Flights ↗": "開啟 Google Flights ↗",
@@ -1040,14 +1064,10 @@
         "Montreal:": "蒙特婁：",
         "Bilbao:": "畢爾包：",
         "Baymont rejected. DoubleTree and Sheraton had no UL contract rate through CWT. Days Inn is the low-friction fallback.": "已排除 Baymont。DoubleTree 與 Sheraton 透過 CWT 無 UL 合約價；Days Inn 是最直接的備案。",
-        "Hampton Montreal-Dorval is confirmed for three nights with breakfast; the CWT total is CAD 560.49.": "Hampton Montreal-Dorval 已確認入住三晚並含早餐；CWT 總額為 CAD 560.49。",
-        "Celine booked NH La Avanzada as the lower-cost corporate option; four nights with breakfast total EUR 608.72.": "Celine 已預訂較低價的企業方案 NH La Avanzada；四晚含早餐共 EUR 608.72。",
         "Hotel blocker:": "住宿阻礙：",
-        "myCWT could not match James’s email, so the profile/credit-card guarantee could not be updated.": "myCWT 無法比對 James 的電子郵件，因此無法更新個人資料與信用卡擔保。",
         "Detroit arrival:": "底特律抵達：",
         "go directly from DTW to Southfield by car; avoid a long late-night public-transit journey with luggage.": "由 DTW 直接搭車前往 Southfield，避免深夜攜帶行李搭乘耗時的大眾運輸。",
         "Accounting:": "費用處理：",
-        "trip marked Non-Billable. BIO→Taiwan remains the company-return benchmark; private extension details need final policy handling.": "旅程標記為 Non-Billable。BIO→台灣仍是公司返程費用基準；私人延伸行程需依最終政策處理。",
         "Privacy:": "隱私：",
         "ticket numbers, booking references, phone numbers and personal email addresses are intentionally excluded here.": "此頁刻意排除票號、訂位代碼、電話號碼與私人電子郵件。",
         "Dismissed / older options": "已排除／較早選項",
@@ -1078,8 +1098,6 @@
         "Keynote, technical sessions and panels, including future powertrain development and scaling ADAS/autonomous mobility.": "包含專題演講、技術場次與論壇，主題涵蓋未來動力系統開發及 ADAS／自動駕駛規模化。",
         "Select one industry tour · transportation from hotel provided": "選擇一項產業參訪 · 飯店提供交通",
         "RSVP required. Tour times include travel.": "必須 RSVP。所列時間包含交通。",
-        "09:15 · 4h · Auburn Hills · capacity 20 · NDA + lunch": "09:15 · 4 小時 · Auburn Hills · 20 人 · NDA＋午餐",
-        "08:30 · 3h · Ann Arbor · capacity 40": "08:30 · 3 小時 · Ann Arbor · 40 人",
         "09:00 · 1.5h · Pontiac · capacity 60": "09:00 · 1.5 小時 · Pontiac · 60 人",
         "Official tour details & RSVP ↗": "官方參訪資訊與 RSVP ↗",
         "A working rhythm for the whole trip. Specific Bilbao and Barcelona days stay open until new information arrives.": "整體旅程的工作節奏；畢爾包與巴塞隆納的詳細日期待新資訊補上。",
@@ -1125,7 +1143,6 @@
         "Hotel checkout by 12:00. LH443 departs 16:00.": "12:00 前退房；LH443 於 16:00 起飛。",
         "Frankfurt → Bilbao": "法蘭克福 → 畢爾包",
         "Arrive BIO 13:00. Check in, eat and recover.": "13:00 抵達 BIO；辦理入住、用餐並休息。",
-        "Arrive BIO 13:00. Check in at NH La Avanzada, eat and recover.": "13:00 抵達 BIO；前往 NH La Avanzada 辦理入住、用餐並休息。",
         "Bilbao reset day": "畢爾包調整日",
         "Prepare for the work week; confirm office route and meeting plan.": "準備工作週，確認辦公地點路線與會議安排。",
         "Details open": "細節待補",
@@ -1151,7 +1168,6 @@
         "Keep the Westin confirmation private; confirm a late-arrival note if needed.": "保留 Westin 確認資料為私密資訊；如有需要，確認晚到備註。",
         "Register for ASME DRIVN and RSVP for one industry tour.": "完成 ASME DRIVN 報名，並選擇一項產業參訪 RSVP。",
         "Add Bilbao hotel, work address, contacts and meeting dates.": "補上畢爾包住宿、工作地址、聯絡資訊與會議日期。",
-        "Save the NH La Avanzada confirmation; add the worksite, contacts and meeting dates.": "保存 NH La Avanzada 訂房確認；補上工作地點、聯絡人與會議日期。",
         "Book BIO→BCN and Barcelona stay.": "預訂 BIO→BCN 與巴塞隆納住宿。",
         "Check passport, U.S. ESTA, Canada eTA, insurance and company approvals.": "檢查護照、美國 ESTA、加拿大 eTA、保險與公司核准。",
         "Source hierarchy": "資料來源優先順序",
@@ -1173,7 +1189,6 @@
         "Fallback address and current property information.": "備案地址與目前飯店資訊。",
         "Hampton Montreal-Dorval official site ↗": "Hampton Montreal-Dorval 官網 ↗",
         "Official property address and hotel information.": "飯店官方地址與住宿資訊。",
-        "NH La Avanzada official site ↗": "NH La Avanzada 官網 ↗",
         "Official property address and location information.": "飯店官方地址與位置資訊。",
         "Share-safe by design.": "依安全分享原則設計。",
         "This copy excludes booking references, ticket numbers, payment data, private email addresses and personal phone numbers. Do not add those before publishing publicly.": "此版本不含訂位代碼、票號、付款資料、私人電子郵件與個人電話。公開發布前請勿加入這些資訊。",
@@ -1181,7 +1196,83 @@
         "Montreal · Detroit · Spain trip board": "蒙特婁 · 底特律 · 西班牙旅程看板",
         "Dashboard link copied.": "已複製旅程看板連結。",
         "This is a local file. Publish it before sharing a link.": "這是本機檔案；發布後才能分享連結。",
-        "Could not share from this browser.": "此瀏覽器無法分享。"
+        "Could not share from this browser.": "此瀏覽器無法分享。",
+        "Evidence reviewed · 4 Sep 2026": "佐證審閱日期 · 2026 年 9 月 4 日",
+        "Current stage: flights ticketed; Detroit stay and rental confirmed; Bilbao hotel cancelled": "目前階段：航班已開票；底特律住宿與租車已確認；畢爾包飯店已取消",
+        "Activate the ASME Conference App profile": "啟用 ASME Conference App 個人檔案",
+        "ASME requires activation within 48 hours of its 4 September email; use the app for the live agenda and attendee information.": "ASME 要求在 9 月 4 日電子郵件後 48 小時內啟用；請使用 App 查看即時議程與與會者資訊。",
+        "Action": "待處理",
+        "Former CWT booking:": "原 CWT 訂房：",
+        "CWT confirms the booking was cancelled in its system on 14 Aug. The final cancellation charge or refund, replacement lodging, and funding treatment remain TBD.": "CWT 確認該訂房已於 8 月 14 日在系統中取消。最終取消費或退款、替代住宿與經費處理仍待確認。",
+        "Cancelled · refund TBD": "已取消 · 退款待確認",
+        "CWT confirms a five-day Detroit airport rental; drive directly to Southfield after the late arrival.": "CWT 確認五天的底特律機場租車；深夜抵達後直接開車前往 Southfield。",
+        "Presentation session · 09:20–11:20": "簡報場次 · 09:20–11:20",
+        "Present “Leakage-Aware Modeling for Lithium-Ion Battery Degradation Forecasting” in Session 12-04: Battery Degradation and Thermal Management.": "於 12-04 場次「Battery Degradation and Thermal Management」發表「Leakage-Aware Modeling for Lithium-Ion Battery Degradation Forecasting」。",
+        "Official session schedule ↗": "官方場次議程 ↗",
+        "ASME DRIVN presentation · 09:20–11:20 Eastern": "ASME DRIVN 簡報 · 美東時間 09:20–11:20",
+        "Present “Leakage-Aware Modeling for Lithium-Ion Battery Degradation Forecasting” in the Battery Degradation and Thermal Management session.": "於 Battery Degradation and Thermal Management 場次發表「Leakage-Aware Modeling for Lithium-Ion Battery Degradation Forecasting」。",
+        "Activate the ASME Conference App profile and RSVP for one industry tour.": "啟用 ASME Conference App 個人檔案，並選擇一項產業參訪 RSVP。",
+        "ASME presentation session ↗": "ASME 簡報場次 ↗",
+        "Tuesday 15 September, 09:20–11:20 Eastern · Battery Degradation and Thermal Management.": "9 月 15 日星期二，美東時間 09:20–11:20 · Battery Degradation and Thermal Management。",
+        "Check remaining entry documents": "確認其餘入境文件",
+        "Evidence reviewed · 9 Sep 2026": "佐證審閱日期 · 2026 年 9 月 9 日",
+        "Current stage: departure preparation; flights, stays and core ground transport confirmed": "目前階段：出發準備中；航班、住宿與主要地面交通已確認",
+        "Seven flight segments, the Montreal and Detroit stays, Detroit rental, and the Bilbao stay are confirmed. Canada entry documents are cleared and ArriveCAN is submitted; Taipei airport transfer, U.S. ESTA approval and the 18 Sep rental return need final confirmation.": "七段航班、蒙特婁與底特律住宿、底特律租車及畢爾包住宿均已確認。加拿大入境文件已確認，ArriveCAN 已提交；桃園機場接送、美國 ESTA 核准與 9 月 18 日租車歸還仍待最終確認。",
+        "Confirm Taipei airport transfer": "確認桃園機場接送",
+        "A request was sent on 8 Sep; confirm the driver, pickup time and meeting point.": "已於 9 月 8 日送出派車申請；請確認司機、接送時間與會合地點。",
+        "Confirm U.S. ESTA approval": "確認美國 ESTA 核准",
+        "An ESTA application was submitted on 7 Sep. Before departure, verify the official status is “Authorization Approved”.": "ESTA 已於 9 月 7 日送出申請。出發前請確認官方狀態為「Authorization Approved」。",
+        "Prepare presentation delivery": "準備簡報交付",
+        "Organizer email lists your slot as 10:20–10:40 Eastern on 15 Sep. Arrive 10–15 minutes early with a USB copy, then confirm the final room and order in the app.": "主辦方電子郵件列出你的時段為 9 月 15 日美東時間 10:20–10:40。請提前 10–15 分鐘抵達並攜帶 USB 簡報副本，接著在 App 中確認最終場地與順序。",
+        "Verify ASME Conference App access": "確認 ASME Conference App 存取狀態",
+        "The activation window noted in the 4 Sep email has passed; confirm your profile is active and use the app for the live agenda and attendee information.": "9 月 4 日電子郵件所述的啟用期限已過；請確認個人檔案已啟用，並使用 App 查看即時議程與與會者資訊。",
+        "Choose an industry tour": "選擇產業參訪",
+        "Advanced registration is required; tours overlap, so select one.": "需提前報名；各參訪時間重疊，請只選一項。",
+        "Return Hertz early on 18 Sep": "9 月 18 日提早歸還 Hertz 租車",
+        "Current return is 15:00 at DTW; LH443 departs at 16:00. Arrange an earlier return.": "目前預定於 15:00 在 DTW 歸還；LH443 於 16:00 起飛。請安排提早歸還。",
+        "Complete the Spain extension plan": "完成西班牙延伸行程規劃",
+        "After 22 Sep, confirm transport and accommodation for Madrid and Barcelona.": "9 月 22 日後，請確認前往馬德里與巴塞隆納的交通和住宿。",
+        "Times are local. “Ticketed” means an e-ticket receipt was issued on 4 Aug. The current e-tickets do not state a free baggage allowance for these flights; confirm directly with each carrier before departure.": "時間皆為當地時間。「已開票」表示 8 月 4 日已開立電子機票收據。目前電子機票未列出這些航段的免費行李額度；出發前請直接向各航空公司確認。",
+        "Not stated": "未註明",
+        "Keep the issued confirmation available; it shows a 9 Sep cancellation deadline.": "請保留正式確認文件；其中列有 9 月 9 日的取消期限。",
+        "The Westin Southfield Detroit stay for 13–18 Sep is confirmed.": "The Westin Southfield Detroit 於 9 月 13–18 日的住宿已確認。",
+        "Arrive DTW at 21:29 on 13 Sep. The Detroit airport rental is confirmed through 18 Sep at 15:00; arrange an earlier return for the 16:00 flight.": "9 月 13 日 21:29 抵達 DTW。底特律機場租車已確認至 9 月 18 日 15:00；請為 16:00 的航班安排提早歸還。",
+        "19–22 Sep · 3 nights": "9 月 19–22 日 · 3 晚",
+        "Confirmed lodging:": "已確認住宿：",
+        "19–22 Sep.": "9 月 19–22 日。",
+        "The former CWT booking was cancelled on 14 Aug. Keep the current lodging confirmation private.": "原 CWT 訂房已於 8 月 14 日取消。請將目前住宿確認文件保留為私密資訊。",
+        "Hampton Montreal-Dorval is confirmed for three nights with breakfast.": "Hampton Montreal-Dorval 已確認入住三晚並含早餐。",
+        "lodging is confirmed for 19–22 Sep; the former CWT booking was cancelled on 14 Aug.": "住宿已確認為 9 月 19–22 日；原 CWT 訂房已於 8 月 14 日取消。",
+        "Organizer’s scheduled slot · 10:20–10:40 Eastern": "主辦方排定時段 · 美東時間 10:20–10:40",
+        "The live session page shows a 09:20–11:20 window and notes that presentation timing can shift; confirm the room and order in the ASME Conferences App.": "即時場次頁面顯示 09:20–11:20 的時段，並註明簡報時間可能調整；請在 ASME Conferences App 中確認場地與順序。",
+        "Select one industry tour · transportation provided": "選擇一項產業參訪 · 提供交通接駁",
+        "Advanced registration is required. Only choose one: schedules overlap.": "需要提前報名。各行程時間重疊，請只選一項。",
+        "10:00 pick-up · 10:45–14:45 · Auburn Hills · NDA + lunch": "10:00 接駁 · 10:45–14:45 · Auburn Hills · NDA＋午餐",
+        "08:00 hotel pick-up · 09:00–11:00 · Ann Arbor · capacity 40": "08:00 飯店接駁 · 09:00–11:00 · Ann Arbor · 容量 40 人",
+        "ASME DRIVN presentation · 10:20–10:40 Eastern": "ASME DRIVN 簡報 · 美東時間 10:20–10:40",
+        "Organizer email lists this slot for “Leakage-Aware Modeling for Lithium-Ion Battery Degradation Forecasting.” Arrive 10–15 minutes early with a USB copy; confirm the room and order in the app.": "主辦方電子郵件列出「Leakage-Aware Modeling for Lithium-Ion Battery Degradation Forecasting」的這個時段。請提前 10–15 分鐘抵達並攜帶 USB 簡報副本；在 App 中確認場地與順序。",
+        "Hotel checkout by 12:00. Return the Hertz rental early enough for LH443 at 16:00.": "12:00 前退房；請提早歸還 Hertz 租車，以趕上 16:00 的 LH443。",
+        "Arrive BIO 13:00. Check in to confirmed lodging, eat and recover.": "13:00 抵達 BIO。前往已確認的住宿辦理入住、用餐並休息。",
+        "Bilbao work & onward planning": "畢爾包工作與後續行程規劃",
+        "Confirmed lodging ends 22 Sep. Add the worksite details, then confirm onward transport and accommodation.": "已確認住宿於 9 月 22 日結束。補上工作地點細節後，確認後續交通與住宿。",
+        "Confirm Taipei airport transfer: driver, pickup time and meeting point.": "確認桃園機場接送：司機、接送時間與會合地點。",
+        "Arrange an earlier Hertz return on 18 Sep for the 16:00 LH443 departure.": "請於 9 月 18 日提早歸還 Hertz 租車，以搭乘 16:00 的 LH443。",
+        "Pack a USB copy of the DRIVN presentation and arrive by 10:05 Eastern on 15 Sep.": "準備 DRIVN 簡報的 USB 副本，並在 9 月 15 日美東時間 10:05 前抵達。",
+        "Verify ASME Conference App access, confirm your session room, and RSVP for one industry tour.": "確認 ASME Conference App 可使用、簡報場地，並選擇一項產業參訪 RSVP。",
+        "Save the current Bilbao lodging confirmation; check out on 22 Sep.": "保存目前畢爾包住宿確認；於 9 月 22 日退房。",
+        "Confirm transport and accommodation after 22 Sep, including Madrid and Barcelona.": "確認 9 月 22 日後的交通與住宿，包括馬德里與巴塞隆納。",
+        "Verify U.S. ESTA approval; carry your passport, Canadian entry document and ArriveCAN declaration.": "確認美國 ESTA 核准；攜帶護照、加拿大入境文件及 ArriveCAN 申報資料。",
+        "The 4 Aug receipts confirm all seven flight segments; the 6 Aug confirmations cover the Montreal and former Bilbao hotel bookings. The former Bilbao booking was later cancelled. Issued documents remain final authority.": "8 月 4 日收據確認七段航班；8 月 6 日確認文件涵蓋蒙特婁與原畢爾包飯店訂房。原畢爾包訂房其後已取消；仍以正式文件為最終依據。",
+        "Tuesday 15 September, 09:20–11:20 Eastern · Battery Degradation and Thermal Management; use the app for the final room and run order.": "9 月 15 日星期二，美東時間 09:20–11:20 · Battery Degradation and Thermal Management；請在 App 中確認最終場地與順序。",
+        "Private travel-document wallet": "私人旅行文件錢包",
+        "Stored only on this device. It is excluded from sharing and printing.": "僅儲存在此裝置；不會包含在分享或列印內容中。",
+        "Canada eTA": "加拿大 eTA",
+        "eTA number": "eTA 號碼",
+        "U.S. ESTA": "美國 ESTA",
+        "Application number": "申請號碼",
+        "Source email link": "來源電子郵件連結",
+        "Open source email ↗": "開啟來源電子郵件 ↗",
+        "Not saved": "尚未儲存"
       });
 
       let currentLanguage = 'en';
@@ -1291,6 +1382,72 @@
           }
         }, 220);
       });
+
+      const documentWalletKey = 'montreal-detroit-spain-2026-document-wallet';
+      const documentWalletInputs = {
+        etaNumber: document.getElementById('etaNumber'),
+        etaEmailUrl: document.getElementById('etaEmailUrl'),
+        estaNumber: document.getElementById('estaNumber'),
+        estaEmailUrl: document.getElementById('estaEmailUrl')
+      };
+      const documentWalletState = document.getElementById('documentWalletState');
+      const documentWalletLinks = {
+        etaEmailUrl: document.getElementById('etaOpenEmail'),
+        estaEmailUrl: document.getElementById('estaOpenEmail')
+      };
+      const safeMailUrl = value => {
+        try {
+          const url = new URL(value);
+          return url.protocol === 'https:' && url.hostname === 'mail.google.com' && url.pathname.startsWith('/mail/') ? url.href : '';
+        } catch (_) {
+          return '';
+        }
+      };
+      const getDocumentWallet = () => {
+        try {
+          const stored = JSON.parse(localStorage.getItem(documentWalletKey) || '{}');
+          return Object.fromEntries(Object.keys(documentWalletInputs).map(key => [key, typeof stored[key] === 'string' ? stored[key] : '']));
+        } catch (_) {
+          return Object.fromEntries(Object.keys(documentWalletInputs).map(key => [key, '']));
+        }
+      };
+      const renderDocumentWallet = () => {
+        const wallet = getDocumentWallet();
+        Object.entries(documentWalletInputs).forEach(([key, input]) => { input.value = wallet[key]; });
+        Object.entries(documentWalletLinks).forEach(([key, link]) => {
+          const href = safeMailUrl(wallet[key]);
+          link.hidden = !href;
+          if (href) link.href = href;
+          else link.removeAttribute('href');
+        });
+        documentWalletState.textContent = Object.values(wallet).some(Boolean) ? uiText('Saved locally') : uiText('Not saved');
+      };
+      let documentWalletTimer;
+      const saveDocumentWallet = () => {
+        const wallet = Object.fromEntries(Object.entries(documentWalletInputs).map(([key, input]) => [key, input.value.trim()]));
+        try {
+          localStorage.setItem(documentWalletKey, JSON.stringify(wallet));
+          renderDocumentWallet();
+        } catch (_) {
+          documentWalletState.textContent = uiText('Local save unavailable');
+        }
+      };
+      Object.values(documentWalletInputs).forEach(input => input.addEventListener('input', () => {
+        documentWalletState.textContent = uiText('Saving…');
+        clearTimeout(documentWalletTimer);
+        documentWalletTimer = setTimeout(saveDocumentWallet, 220);
+      }));
+      window.setPrivateTravelDocuments = wallet => {
+        if (!wallet || typeof wallet !== 'object') return;
+        const sanitized = Object.fromEntries(Object.keys(documentWalletInputs).map(key => [key, typeof wallet[key] === 'string' ? wallet[key] : '']));
+        try {
+          localStorage.setItem(documentWalletKey, JSON.stringify(sanitized));
+          renderDocumentWallet();
+        } catch (_) {
+          documentWalletState.textContent = uiText('Local save unavailable');
+        }
+      };
+      renderDocumentWallet();
 
       document.querySelectorAll('#checklist input[type="checkbox"]').forEach(box => {
         const key = `montreal-detroit-spain-2026-check-${box.dataset.key}`;
@@ -1580,6 +1737,7 @@
         updateReadiness();
         privacyMode.textContent = uiText(closeoutView.hidden ? 'Public view · share-safe' : 'Private workspace · local only');
         updateCountdown();
+        renderDocumentWallet();
         try { localStorage.setItem(languageStorageKey, currentLanguage); } catch (_) {}
       };
 
@@ -1594,5 +1752,6 @@
       setWorkspaceMode(savedMode);
     })();
   </script>
+  <script src="private-travel-documents.js"></script>
 </body>
 </html>
