@@ -451,7 +451,7 @@
         </button>
         <button class="button closeout-only" id="saveDraftButton" type="button" hidden>Save draft</button>
         <button class="button primary closeout-only" id="generateReportButton" type="button" hidden>Generate admin PDF</button>
-        <div class="last-updated plan-only">Evidence reviewed · 9 Sep 2026</div>
+        <div class="last-updated plan-only">Evidence reviewed · 23 Oct 2026</div>
       </div>
     </header>
 
@@ -743,6 +743,8 @@
               <h3>Expense register</h3>
               <div class="expense-toolbar-actions">
                 <button class="button primary" id="addExpenseButton" type="button">+ Add expense</button>
+                <button class="button" id="importBackupButton" type="button">Import backup</button>
+                <input id="importBackupInput" type="file" accept="application/json,.json" hidden>
                 <button class="button" id="downloadBackupButton" type="button">Download backup</button>
               </div>
             </div>
@@ -753,7 +755,7 @@
               <div class="field"><label for="expenseCategory">Category</label><select id="expenseCategory"><option>Accommodation</option><option>Transport</option><option>Meals</option><option>Telecom</option><option>Conference</option><option>Other</option></select></div>
               <div class="field"><label for="expenseCurrency">Currency</label><input id="expenseCurrency" value="CAD" maxlength="3" required></div>
               <div class="field"><label for="expenseOriginal">Original amount</label><input id="expenseOriginal" type="number" min="0" step="0.01" required></div>
-              <div class="field"><label for="expenseTwd">TWD charged</label><input id="expenseTwd" type="number" min="0" step="1" required></div>
+              <div class="field"><label for="expenseTwd">TWD charged</label><input id="expenseTwd" type="number" min="0" step="1" placeholder="Pending statement"></div>
               <div class="field"><label for="expenseFee">Service fee (TWD)</label><input id="expenseFee" type="number" min="0" step="1" value="0"></div>
               <div class="field"><label for="expenseEvidence">Evidence filename</label><input id="expenseEvidence" placeholder="Optional"></div>
               <div class="form-actions"><button class="button" id="cancelExpenseButton" type="button">Cancel</button><button class="button primary" type="submit">Add to report</button></div>
@@ -852,6 +854,7 @@
         "ASME DRIVN conference and business meetings": "ASME DRIVN 大會與商務會議",
         "Expense register": "費用明細",
         "+ Add expense": "＋ 新增費用",
+        "Import backup": "匯入備份",
         "Download backup": "下載備份",
         "Date": "日期",
         "Merchant / item": "商店／項目",
@@ -865,6 +868,7 @@
         "Currency": "幣別",
         "Original amount": "原幣金額",
         "TWD charged": "信用卡請款 TWD",
+        "Pending statement": "待信用卡帳單",
         "Service fee (TWD)": "國外交易服務費（TWD）",
         "Evidence filename": "憑證檔名",
         "Optional": "選填",
@@ -890,6 +894,8 @@
         "Edit the trip name, dates and purpose for the next destination.": "請為下一個目的地編輯旅程名稱、日期與出差目的。",
         "Expense added to the private draft.": "費用已加入私人草稿。",
         "Private draft saved on this device.": "私人草稿已儲存在此裝置。",
+        "Backup imported into the private workspace.": "備份已匯入私人工作區。",
+        "This backup file is not valid.": "這個備份檔案格式無效。",
         "Business Trip Reimbursement": "商務旅行費用報帳",
         "1. TWD claim summary": "1. TWD 申請摘要",
         "2. Foreign-currency reconciliation": "2. 外幣核對",
@@ -899,6 +905,7 @@
         "Card / bill charges": "信用卡／帳單請款",
         "Service fees": "國外交易服務費",
         "TWD claim total": "TWD 申請總額",
+        "TWD pending": "待補台幣入帳筆數",
         "Not provided": "尚未提供",
         "No expenses entered.": "尚未輸入費用。",
         "No telecom allocation entered.": "尚未輸入電信費用分攤。",
@@ -915,6 +922,7 @@
         "Print": "列印",
         "Conversation reviewed · 4 Aug 2026": "對話整理日期 · 2026 年 8 月 4 日",
         "Evidence reviewed · 21 Aug 2026": "佐證審閱日期 · 2026 年 8 月 21 日",
+        "Evidence reviewed · 23 Oct 2026": "佐證審閱日期 · 2026 年 10 月 23 日",
         "Dashboard sections": "旅程看板區段",
         "Overview": "概覽",
         "Flights": "航班",
@@ -1502,8 +1510,11 @@
       });
 
       const safeNumber = value => Number.isFinite(Number(value)) ? Number(value) : 0;
+      const hasAmount = value => value !== '' && value !== null && value !== undefined && Number.isFinite(Number(value));
       const claimTotal = () => expenses.reduce((sum, item) => sum + safeNumber(item.twd) + safeNumber(item.fee), 0);
+      const pendingTwdCount = () => expenses.filter(item => !hasAmount(item.twd)).length;
       const formatTwd = value => `TWD ${Math.round(value).toLocaleString('en-US')}`;
+      const formatOptionalAmount = value => hasAmount(value) ? Math.round(Number(value)).toLocaleString('en-US') : '—';
 
       const saveCloseoutDraft = () => {
         const fields = {};
@@ -1530,12 +1541,17 @@
 
       const updateReadiness = () => {
         const detailsReady = Boolean(document.getElementById('reportAdminCode').value.trim());
-        const expensesReady = expenses.length > 0;
+        const expensesReady = expenses.length > 0 && pendingTwdCount() === 0;
         const evidenceReady = receiptFiles.length > 0;
         const ready = [detailsReady, expensesReady, evidenceReady].filter(Boolean).length;
         document.getElementById('readinessText').textContent = currentLanguage === 'zh-Hant' ? `3 項檢查中 ${ready} 項完成` : `${ready} of 3 checks ready`;
         document.getElementById('detailsStep').textContent = uiText(detailsReady ? 'Ready' : 'Needs admin code');
-        document.getElementById('expensesStep').textContent = expensesReady ? (currentLanguage === 'zh-Hant' ? `${expenses.length} 筆費用` : `${expenses.length} expense ${expenses.length === 1 ? 'entry' : 'entries'}`) : uiText('No entries yet');
+        const pending = pendingTwdCount();
+        document.getElementById('expensesStep').textContent = !expenses.length
+          ? uiText('No entries yet')
+          : pending
+            ? (currentLanguage === 'zh-Hant' ? `${expenses.length} 筆費用 · ${pending} 筆待台幣入帳` : `${expenses.length} entries · ${pending} TWD pending`)
+            : (currentLanguage === 'zh-Hant' ? `${expenses.length} 筆費用` : `${expenses.length} expense ${expenses.length === 1 ? 'entry' : 'entries'}`);
         document.getElementById('evidenceStep').textContent = evidenceReady ? (currentLanguage === 'zh-Hant' ? `${receiptFiles.length} 個檔案` : `${receiptFiles.length} evidence ${receiptFiles.length === 1 ? 'file' : 'files'}`) : uiText('Choose receipt folder');
       };
 
@@ -1546,7 +1562,9 @@
         if (type === 'number') { input.min = '0'; input.step = field === 'original' ? '0.01' : '1'; }
         input.setAttribute('aria-label', field);
         input.addEventListener('change', () => {
-          expenses[index][field] = type === 'number' ? safeNumber(input.value) : input.value;
+          expenses[index][field] = type === 'number'
+            ? ((field === 'twd' || field === 'fee') && input.value === '' ? '' : safeNumber(input.value))
+            : input.value;
           saveCloseoutDraft();
           renderExpenses();
         });
@@ -1586,7 +1604,10 @@
             rows.appendChild(row);
           });
         }
-        document.getElementById('claimTotal').textContent = formatTwd(claimTotal());
+        const pending = pendingTwdCount();
+        document.getElementById('claimTotal').textContent = pending
+          ? `${formatTwd(claimTotal())} · ${currentLanguage === 'zh-Hant' ? `${pending} 筆待台幣入帳` : `${pending} TWD pending`}`
+          : formatTwd(claimTotal());
         updateReadiness();
       };
 
@@ -1604,7 +1625,7 @@
           category: document.getElementById('expenseCategory').value,
           currency: document.getElementById('expenseCurrency').value.trim().toUpperCase(),
           original: safeNumber(document.getElementById('expenseOriginal').value),
-          twd: safeNumber(document.getElementById('expenseTwd').value),
+          twd: document.getElementById('expenseTwd').value === '' ? '' : safeNumber(document.getElementById('expenseTwd').value),
           fee: safeNumber(document.getElementById('expenseFee').value),
           evidence: document.getElementById('expenseEvidence').value.trim()
         });
@@ -1630,6 +1651,38 @@
         link.download = `${(fields.reportTripName || 'business-trip').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase()}-closeout.json`;
         link.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
+      });
+
+      const importBackupInput = document.getElementById('importBackupInput');
+      document.getElementById('importBackupButton').addEventListener('click', () => importBackupInput.click());
+      importBackupInput.addEventListener('change', async event => {
+        const file = event.target.files[0];
+        if (!file) return;
+        try {
+          const backup = JSON.parse(await file.text());
+          if (!backup || typeof backup !== 'object' || !Array.isArray(backup.expenses)) throw new Error('Invalid backup');
+          Object.entries(backup.fields || {}).forEach(([id, value]) => {
+            const field = document.getElementById(id);
+            if (field && closeoutFields.includes(id) && typeof value === 'string') field.value = value;
+          });
+          expenses = backup.expenses.map(item => ({
+            date: typeof item.date === 'string' ? item.date : '',
+            merchant: typeof item.merchant === 'string' ? item.merchant : '',
+            category: expenseCategories.includes(item.category) ? item.category : 'Other',
+            currency: typeof item.currency === 'string' ? item.currency.toUpperCase().slice(0, 3) : '',
+            original: safeNumber(item.original),
+            twd: hasAmount(item.twd) ? safeNumber(item.twd) : '',
+            fee: hasAmount(item.fee) ? safeNumber(item.fee) : '',
+            evidence: typeof item.evidence === 'string' ? item.evidence : ''
+          }));
+          saveCloseoutDraft();
+          renderExpenses();
+          showToast('Backup imported into the private workspace.');
+        } catch (_) {
+          showToast('This backup file is not valid.');
+        } finally {
+          event.target.value = '';
+        }
       });
 
       document.getElementById('receiptFolder').addEventListener('change', event => {
@@ -1664,29 +1717,30 @@
 
         const charged = expenses.reduce((sum, item) => sum + safeNumber(item.twd), 0);
         const fees = expenses.reduce((sum, item) => sum + safeNumber(item.fee), 0);
+        const pending = pendingTwdCount();
         const summary = document.getElementById('printSummary'); summary.replaceChildren();
-        [['Card / bill charges', charged], ['Service fees', fees], ['TWD claim total', charged + fees]].forEach(([label, value]) => {
+        [['Card / bill charges', formatTwd(charged)], ['Service fees', formatTwd(fees)], ['TWD claim total', formatTwd(charged + fees)], ['TWD pending', String(pending)]].forEach(([label, value]) => {
           const box = document.createElement('div'); const caption = document.createElement('span'); const amount = document.createElement('strong');
-          caption.textContent = uiText(label); amount.textContent = formatTwd(value); box.append(caption, amount); summary.appendChild(box);
+          caption.textContent = uiText(label); amount.textContent = value; box.append(caption, amount); summary.appendChild(box);
         });
 
         const groups = new Map();
         expenses.forEach(item => {
           const key = `${item.currency}|${item.category}`;
-          const group = groups.get(key) || { currency: item.currency, category: item.category, original: 0, twd: 0, fee: 0 };
-          group.original += safeNumber(item.original); group.twd += safeNumber(item.twd); group.fee += safeNumber(item.fee); groups.set(key, group);
+          const group = groups.get(key) || { currency: item.currency, category: item.category, original: 0, twd: 0, fee: 0, pending: 0 };
+          group.original += safeNumber(item.original); group.twd += safeNumber(item.twd); group.fee += safeNumber(item.fee); if (!hasAmount(item.twd)) group.pending += 1; groups.set(key, group);
         });
         const currencyRows = document.getElementById('printCurrencyRows'); currencyRows.replaceChildren();
-        [...groups.values()].forEach(group => { const row = document.createElement('tr'); [group.currency, uiText(group.category), group.original.toFixed(2), Math.round(group.twd).toLocaleString(), Math.round(group.fee).toLocaleString()].forEach(value => addTextCell(row, value)); currencyRows.appendChild(row); });
+        [...groups.values()].forEach(group => { const row = document.createElement('tr'); [group.currency, uiText(group.category), group.original.toFixed(2), group.pending ? `${Math.round(group.twd).toLocaleString()} · ${group.pending} pending` : Math.round(group.twd).toLocaleString(), Math.round(group.fee).toLocaleString()].forEach(value => addTextCell(row, value)); currencyRows.appendChild(row); });
         if (!groups.size) { const row = document.createElement('tr'); const cell = document.createElement('td'); cell.colSpan = 5; cell.textContent = uiText('No expenses entered.'); row.appendChild(cell); currencyRows.appendChild(row); }
 
         const expensePrintRows = document.getElementById('printExpenseRows'); expensePrintRows.replaceChildren();
-        expenses.forEach(item => { const row = document.createElement('tr'); [item.date, item.merchant, uiText(item.category), `${item.currency} ${safeNumber(item.original).toFixed(2)}`, Math.round(safeNumber(item.twd)).toLocaleString(), Math.round(safeNumber(item.fee)).toLocaleString(), item.evidence || '—'].forEach(value => addTextCell(row, value)); expensePrintRows.appendChild(row); });
+        expenses.forEach(item => { const row = document.createElement('tr'); [item.date, item.merchant, uiText(item.category), `${item.currency} ${safeNumber(item.original).toFixed(2)}`, formatOptionalAmount(item.twd), formatOptionalAmount(item.fee), item.evidence || '—'].forEach(value => addTextCell(row, value)); expensePrintRows.appendChild(row); });
         if (!expenses.length) { const row = document.createElement('tr'); const cell = document.createElement('td'); cell.colSpan = 7; cell.textContent = uiText('No expenses entered.'); row.appendChild(cell); expensePrintRows.appendChild(row); }
 
         const telecomRows = document.getElementById('printTelecomRows'); telecomRows.replaceChildren();
         const telecom = expenses.filter(item => item.category === 'Telecom');
-        telecom.forEach(item => { const row = document.createElement('tr'); [item.date, item.merchant, `${item.currency} ${safeNumber(item.original).toFixed(2)}`, formatTwd(safeNumber(item.twd) + safeNumber(item.fee)), item.evidence || '—'].forEach(value => addTextCell(row, value)); telecomRows.appendChild(row); });
+        telecom.forEach(item => { const row = document.createElement('tr'); [item.date, item.merchant, `${item.currency} ${safeNumber(item.original).toFixed(2)}`, hasAmount(item.twd) ? formatTwd(safeNumber(item.twd) + safeNumber(item.fee)) : '—', item.evidence || '—'].forEach(value => addTextCell(row, value)); telecomRows.appendChild(row); });
         if (!telecom.length) { const row = document.createElement('tr'); const cell = document.createElement('td'); cell.colSpan = 5; cell.textContent = uiText('No telecom allocation entered.'); row.appendChild(cell); telecomRows.appendChild(row); }
 
         const evidence = document.getElementById('printEvidence'); evidence.replaceChildren();
