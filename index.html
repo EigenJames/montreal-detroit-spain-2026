@@ -316,7 +316,7 @@
     .expense-form.open { display: grid; }
     .expense-form .form-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 8px; }
     .expense-table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
-    .expense-table { min-width: 820px; }
+    .expense-table { min-width: 950px; }
     .expense-table th, .expense-table td { padding: 10px; }
     .expense-table input, .expense-table select { min-width: 90px; padding: 6px; color: var(--ink); background: #fff; border: 1px solid transparent; border-radius: 6px; font-size: 11px; }
     .expense-table input:focus, .expense-table select:focus { border-color: var(--blue); outline: none; }
@@ -757,13 +757,14 @@
               <div class="field"><label for="expenseOriginal">Original amount</label><input id="expenseOriginal" type="number" min="0" step="0.01" required></div>
               <div class="field"><label for="expenseTwd">TWD charged</label><input id="expenseTwd" type="number" min="0" step="1" placeholder="Pending statement"></div>
               <div class="field"><label for="expenseFee">Service fee (TWD)</label><input id="expenseFee" type="number" min="0" step="1" value="0"></div>
+              <div class="field"><label for="expenseStatus">Status</label><select id="expenseStatus"><option>Ready to claim</option><option>Needs evidence</option><option>Needs policy/purpose</option><option>Excluded</option></select></div>
               <div class="field"><label for="expenseEvidence">Evidence filename</label><input id="expenseEvidence" placeholder="Optional"></div>
               <div class="form-actions"><button class="button" id="cancelExpenseButton" type="button">Cancel</button><button class="button primary" type="submit">Add to report</button></div>
             </form>
 
             <div class="expense-table-wrap">
               <table class="expense-table">
-                <thead><tr><th>Date</th><th>Merchant / item</th><th>Category</th><th>Currency</th><th>Original</th><th>TWD charged</th><th>Fee</th><th>Evidence</th><th></th></tr></thead>
+                <thead><tr><th>Date</th><th>Merchant / item</th><th>Category</th><th>Currency</th><th>Original</th><th>TWD charged</th><th>Fee</th><th>Status</th><th>Evidence</th><th></th></tr></thead>
                 <tbody id="expenseRows"></tbody>
               </table>
             </div>
@@ -802,7 +803,7 @@
       <header class="report-header"><div><h1>Business Trip Reimbursement</h1><div id="printTripName"></div></div><div class="report-meta" id="printMeta"></div></header>
       <section class="report-section"><h2>1. TWD claim summary</h2><div class="report-summary" id="printSummary"></div></section>
       <section class="report-section"><h2>2. Foreign-currency reconciliation</h2><table class="report-table"><thead><tr><th>Currency</th><th>Category</th><th>Original amount</th><th>TWD charged</th><th>Service fee</th></tr></thead><tbody id="printCurrencyRows"></tbody></table></section>
-      <section class="report-section"><h2>3. Expense lines</h2><table class="report-table"><thead><tr><th>Date</th><th>Merchant / item</th><th>Category</th><th>Original amount</th><th>TWD charged</th><th>Fee</th><th>Evidence</th></tr></thead><tbody id="printExpenseRows"></tbody></table></section>
+      <section class="report-section"><h2>3. Expense lines</h2><table class="report-table"><thead><tr><th>Date</th><th>Merchant / item</th><th>Category</th><th>Original amount</th><th>TWD charged</th><th>Fee</th><th>Status</th><th>Evidence</th></tr></thead><tbody id="printExpenseRows"></tbody></table></section>
       <section class="report-section"><h2>4. Telecom allocation</h2><table class="report-table"><thead><tr><th>Date</th><th>Provider / item</th><th>Original amount</th><th>Claimable TWD</th><th>Evidence</th></tr></thead><tbody id="printTelecomRows"></tbody></table></section>
       <section class="report-section evidence-sheet"><h2>5. Numbered evidence appendix</h2><div id="printEvidence"></div></section>
     </div>
@@ -871,6 +872,11 @@
         "Pending statement": "待信用卡帳單",
         "Service fee (TWD)": "國外交易服務費（TWD）",
         "Evidence filename": "憑證檔名",
+        "Status": "申報狀態",
+        "Ready to claim": "可直接申報",
+        "Needs evidence": "待補憑證",
+        "Needs policy/purpose": "待確認政策／用途",
+        "Excluded": "不列入報帳",
         "Optional": "選填",
         "Cancel": "取消",
         "Add to report": "加入報表",
@@ -906,6 +912,7 @@
         "Service fees": "國外交易服務費",
         "TWD claim total": "TWD 申請總額",
         "TWD pending": "待補台幣入帳筆數",
+        "Expenses under review": "待確認費用筆數",
         "Not provided": "尚未提供",
         "No expenses entered.": "尚未輸入費用。",
         "No telecom allocation entered.": "尚未輸入電信費用分攤。",
@@ -1468,6 +1475,7 @@
       const closeoutStorageKey = 'business-trip-workspace-montreal-detroit-spain-2026';
       const closeoutFields = ['reportTripName', 'reportDates', 'reportTraveler', 'reportAdminCode', 'reportPurpose'];
       const expenseCategories = ['Accommodation', 'Transport', 'Meals', 'Telecom', 'Conference', 'Other'];
+      const expenseStatuses = ['Ready to claim', 'Needs evidence', 'Needs policy/purpose', 'Excluded'];
       let expenses = [];
       let receiptFiles = [];
       let receiptUrls = [];
@@ -1511,8 +1519,10 @@
 
       const safeNumber = value => Number.isFinite(Number(value)) ? Number(value) : 0;
       const hasAmount = value => value !== '' && value !== null && value !== undefined && Number.isFinite(Number(value));
-      const claimTotal = () => expenses.reduce((sum, item) => sum + safeNumber(item.twd) + safeNumber(item.fee), 0);
-      const pendingTwdCount = () => expenses.filter(item => !hasAmount(item.twd)).length;
+      const claimableExpenses = () => expenses.filter(item => item.status === 'Ready to claim');
+      const claimTotal = () => claimableExpenses().reduce((sum, item) => sum + safeNumber(item.twd) + safeNumber(item.fee), 0);
+      const pendingTwdCount = () => claimableExpenses().filter(item => !hasAmount(item.twd)).length;
+      const reviewCount = () => expenses.filter(item => item.status !== 'Ready to claim' && item.status !== 'Excluded').length;
       const formatTwd = value => `TWD ${Math.round(value).toLocaleString('en-US')}`;
       const formatOptionalAmount = value => hasAmount(value) ? Math.round(Number(value)).toLocaleString('en-US') : '—';
 
@@ -1541,7 +1551,7 @@
 
       const updateReadiness = () => {
         const detailsReady = Boolean(document.getElementById('reportAdminCode').value.trim());
-        const expensesReady = expenses.length > 0 && pendingTwdCount() === 0;
+        const expensesReady = claimableExpenses().length > 0 && pendingTwdCount() === 0;
         const evidenceReady = receiptFiles.length > 0;
         const ready = [detailsReady, expensesReady, evidenceReady].filter(Boolean).length;
         document.getElementById('readinessText').textContent = currentLanguage === 'zh-Hant' ? `3 項檢查中 ${ready} 項完成` : `${ready} of 3 checks ready`;
@@ -1550,8 +1560,8 @@
         document.getElementById('expensesStep').textContent = !expenses.length
           ? uiText('No entries yet')
           : pending
-            ? (currentLanguage === 'zh-Hant' ? `${expenses.length} 筆費用 · ${pending} 筆待台幣入帳` : `${expenses.length} entries · ${pending} TWD pending`)
-            : (currentLanguage === 'zh-Hant' ? `${expenses.length} 筆費用` : `${expenses.length} expense ${expenses.length === 1 ? 'entry' : 'entries'}`);
+            ? (currentLanguage === 'zh-Hant' ? `${claimableExpenses().length} 筆可申報 · ${pending} 筆待台幣入帳` : `${claimableExpenses().length} ready · ${pending} TWD pending`)
+            : (currentLanguage === 'zh-Hant' ? `${claimableExpenses().length} 筆可申報 · ${reviewCount()} 筆待確認` : `${claimableExpenses().length} ready · ${reviewCount()} under review`);
         document.getElementById('evidenceStep').textContent = evidenceReady ? (currentLanguage === 'zh-Hant' ? `${receiptFiles.length} 個檔案` : `${receiptFiles.length} evidence ${receiptFiles.length === 1 ? 'file' : 'files'}`) : uiText('Choose receipt folder');
       };
 
@@ -1596,6 +1606,10 @@
             addCell(makeInput(item.original, 'number', index, 'original'));
             addCell(makeInput(item.twd, 'number', index, 'twd'));
             addCell(makeInput(item.fee, 'number', index, 'fee'));
+            const status = document.createElement('select');
+            expenseStatuses.forEach(name => { const option = document.createElement('option'); option.value = name; option.textContent = uiText(name); option.selected = (item.status || 'Needs evidence') === name; status.appendChild(option); });
+            status.addEventListener('change', () => { expenses[index].status = status.value; saveCloseoutDraft(); renderExpenses(); });
+            addCell(status);
             addCell(makeInput(item.evidence, 'text', index, 'evidence'));
             const remove = document.createElement('button');
             remove.type = 'button'; remove.className = 'icon-button'; remove.title = uiText('Remove expense'); remove.textContent = '×';
@@ -1605,9 +1619,10 @@
           });
         }
         const pending = pendingTwdCount();
+        const review = reviewCount();
         document.getElementById('claimTotal').textContent = pending
-          ? `${formatTwd(claimTotal())} · ${currentLanguage === 'zh-Hant' ? `${pending} 筆待台幣入帳` : `${pending} TWD pending`}`
-          : formatTwd(claimTotal());
+          ? `${formatTwd(claimTotal())} · ${currentLanguage === 'zh-Hant' ? `${pending} 筆可申報待台幣入帳` : `${pending} ready TWD pending`}`
+          : `${formatTwd(claimTotal())}${review ? (currentLanguage === 'zh-Hant' ? ` · ${review} 筆待確認` : ` · ${review} under review`) : ''}`;
         updateReadiness();
       };
 
@@ -1627,6 +1642,7 @@
           original: safeNumber(document.getElementById('expenseOriginal').value),
           twd: document.getElementById('expenseTwd').value === '' ? '' : safeNumber(document.getElementById('expenseTwd').value),
           fee: safeNumber(document.getElementById('expenseFee').value),
+          status: document.getElementById('expenseStatus').value,
           evidence: document.getElementById('expenseEvidence').value.trim()
         });
         expenseForm.reset();
@@ -1644,7 +1660,7 @@
       document.getElementById('downloadBackupButton').addEventListener('click', () => {
         const fields = {};
         closeoutFields.forEach(id => fields[id] = document.getElementById(id).value);
-        const blob = new Blob([JSON.stringify({ version: 1, fields, expenses, evidenceFilenames: receiptFiles.map(file => file.name) }, null, 2)], { type: 'application/json' });
+        const blob = new Blob([JSON.stringify({ version: 2, fields, expenses, evidenceFilenames: receiptFiles.map(file => file.name) }, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -1673,6 +1689,7 @@
             original: safeNumber(item.original),
             twd: hasAmount(item.twd) ? safeNumber(item.twd) : '',
             fee: hasAmount(item.fee) ? safeNumber(item.fee) : '',
+            status: expenseStatuses.includes(item.status) ? item.status : 'Needs evidence',
             evidence: typeof item.evidence === 'string' ? item.evidence : ''
           }));
           saveCloseoutDraft();
@@ -1715,17 +1732,18 @@
         document.getElementById('printMeta').innerHTML = '';
         [traveler, code, purpose].forEach(value => { const line = document.createElement('div'); line.textContent = value; document.getElementById('printMeta').appendChild(line); });
 
-        const charged = expenses.reduce((sum, item) => sum + safeNumber(item.twd), 0);
-        const fees = expenses.reduce((sum, item) => sum + safeNumber(item.fee), 0);
+        const claimable = claimableExpenses();
+        const charged = claimable.reduce((sum, item) => sum + safeNumber(item.twd), 0);
+        const fees = claimable.reduce((sum, item) => sum + safeNumber(item.fee), 0);
         const pending = pendingTwdCount();
         const summary = document.getElementById('printSummary'); summary.replaceChildren();
-        [['Card / bill charges', formatTwd(charged)], ['Service fees', formatTwd(fees)], ['TWD claim total', formatTwd(charged + fees)], ['TWD pending', String(pending)]].forEach(([label, value]) => {
+        [['Card / bill charges', formatTwd(charged)], ['Service fees', formatTwd(fees)], ['TWD claim total', formatTwd(charged + fees)], ['TWD pending', String(pending)], ['Expenses under review', String(reviewCount())]].forEach(([label, value]) => {
           const box = document.createElement('div'); const caption = document.createElement('span'); const amount = document.createElement('strong');
           caption.textContent = uiText(label); amount.textContent = value; box.append(caption, amount); summary.appendChild(box);
         });
 
         const groups = new Map();
-        expenses.forEach(item => {
+        claimable.forEach(item => {
           const key = `${item.currency}|${item.category}`;
           const group = groups.get(key) || { currency: item.currency, category: item.category, original: 0, twd: 0, fee: 0, pending: 0 };
           group.original += safeNumber(item.original); group.twd += safeNumber(item.twd); group.fee += safeNumber(item.fee); if (!hasAmount(item.twd)) group.pending += 1; groups.set(key, group);
@@ -1735,11 +1753,11 @@
         if (!groups.size) { const row = document.createElement('tr'); const cell = document.createElement('td'); cell.colSpan = 5; cell.textContent = uiText('No expenses entered.'); row.appendChild(cell); currencyRows.appendChild(row); }
 
         const expensePrintRows = document.getElementById('printExpenseRows'); expensePrintRows.replaceChildren();
-        expenses.forEach(item => { const row = document.createElement('tr'); [item.date, item.merchant, uiText(item.category), `${item.currency} ${safeNumber(item.original).toFixed(2)}`, formatOptionalAmount(item.twd), formatOptionalAmount(item.fee), item.evidence || '—'].forEach(value => addTextCell(row, value)); expensePrintRows.appendChild(row); });
-        if (!expenses.length) { const row = document.createElement('tr'); const cell = document.createElement('td'); cell.colSpan = 7; cell.textContent = uiText('No expenses entered.'); row.appendChild(cell); expensePrintRows.appendChild(row); }
+        expenses.filter(item => item.status !== 'Excluded').forEach(item => { const row = document.createElement('tr'); [item.date, item.merchant, uiText(item.category), `${item.currency} ${safeNumber(item.original).toFixed(2)}`, formatOptionalAmount(item.twd), formatOptionalAmount(item.fee), uiText(item.status || 'Needs evidence'), item.evidence || '—'].forEach(value => addTextCell(row, value)); expensePrintRows.appendChild(row); });
+        if (!expenses.length) { const row = document.createElement('tr'); const cell = document.createElement('td'); cell.colSpan = 8; cell.textContent = uiText('No expenses entered.'); row.appendChild(cell); expensePrintRows.appendChild(row); }
 
         const telecomRows = document.getElementById('printTelecomRows'); telecomRows.replaceChildren();
-        const telecom = expenses.filter(item => item.category === 'Telecom');
+        const telecom = claimable.filter(item => item.category === 'Telecom');
         telecom.forEach(item => { const row = document.createElement('tr'); [item.date, item.merchant, `${item.currency} ${safeNumber(item.original).toFixed(2)}`, hasAmount(item.twd) ? formatTwd(safeNumber(item.twd) + safeNumber(item.fee)) : '—', item.evidence || '—'].forEach(value => addTextCell(row, value)); telecomRows.appendChild(row); });
         if (!telecom.length) { const row = document.createElement('tr'); const cell = document.createElement('td'); cell.colSpan = 5; cell.textContent = uiText('No telecom allocation entered.'); row.appendChild(cell); telecomRows.appendChild(row); }
 
