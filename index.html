@@ -312,6 +312,10 @@
     .field input, .field select { width: 100%; min-height: 40px; padding: 8px 10px; color: var(--ink); background: #fff; border: 1px solid #bfcbd8; border-radius: 8px; font-size: 12px; }
     .expense-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin: 0 0 12px; }
     .expense-toolbar-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .backup-paste { margin: 0 0 16px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #f8fafc; color: #52657d; font-size: 12px; }
+    .backup-paste summary { cursor: pointer; font-weight: 800; color: var(--ink); }
+    .backup-paste p { margin: 8px 0; }
+    .backup-paste textarea { min-height: 110px; margin: 4px 0 8px; }
     .expense-form { display: none; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 12px 0 16px; padding: 14px; background: #f8fafc; border: 1px solid var(--line); border-radius: 12px; }
     .expense-form.open { display: grid; }
     .expense-form .form-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 8px; }
@@ -748,6 +752,12 @@
                 <button class="button" id="downloadBackupButton" type="button">Download backup</button>
               </div>
             </div>
+            <details class="backup-paste">
+              <summary>Paste backup JSON (if file import is unavailable)</summary>
+              <p>Use only on your own device. The text is saved only in this browser’s private workspace and is never published to GitHub.</p>
+              <textarea id="pasteBackupInput" rows="5" placeholder="Paste a closeout backup JSON file here"></textarea>
+              <button class="button" id="pasteBackupButton" type="button">Import pasted backup</button>
+            </details>
 
             <form class="expense-form" id="expenseForm">
               <div class="field"><label for="expenseDate">Date</label><input id="expenseDate" type="date" required></div>
@@ -857,6 +867,10 @@
         "+ Add expense": "＋ 新增費用",
         "Import backup": "匯入備份",
         "Download backup": "下載備份",
+        "Paste backup JSON (if file import is unavailable)": "貼上備份 JSON（檔案匯入無法使用時）",
+        "Use only on your own device. The text is saved only in this browser’s private workspace and is never published to GitHub.": "請僅在自己的裝置上使用。文字只會儲存在此瀏覽器的私人工作區，絕不會發布到 GitHub。",
+        "Paste a closeout backup JSON file here": "請在此貼上費用結案備份 JSON 檔內容",
+        "Import pasted backup": "匯入貼上的備份",
         "Date": "日期",
         "Merchant / item": "商店／項目",
         "Hotel, taxi, meal…": "飯店、計程車、餐費…",
@@ -1669,13 +1683,8 @@
         setTimeout(() => URL.revokeObjectURL(url), 1000);
       });
 
-      const importBackupInput = document.getElementById('importBackupInput');
-      document.getElementById('importBackupButton').addEventListener('click', () => importBackupInput.click());
-      importBackupInput.addEventListener('change', async event => {
-        const file = event.target.files[0];
-        if (!file) return;
+      function importBackup(backup) {
         try {
-          const backup = JSON.parse(await file.text());
           if (!backup || typeof backup !== 'object' || !Array.isArray(backup.expenses)) throw new Error('Invalid backup');
           Object.entries(backup.fields || {}).forEach(([id, value]) => {
             const field = document.getElementById(id);
@@ -1697,8 +1706,29 @@
           showToast('Backup imported into the private workspace.');
         } catch (_) {
           showToast('This backup file is not valid.');
+        }
+      }
+
+      const importBackupInput = document.getElementById('importBackupInput');
+      document.getElementById('importBackupButton').addEventListener('click', () => importBackupInput.click());
+      importBackupInput.addEventListener('change', async event => {
+        const file = event.target.files[0];
+        if (!file) return;
+        try {
+          importBackup(JSON.parse(await file.text()));
         } finally {
           event.target.value = '';
+        }
+      });
+      document.getElementById('pasteBackupButton').addEventListener('click', () => {
+        const input = document.getElementById('pasteBackupInput');
+        const raw = input.value.trim();
+        if (!raw) return;
+        try {
+          importBackup(JSON.parse(raw));
+          input.value = '';
+        } catch (_) {
+          showToast('This backup file is not valid.');
         }
       });
 
