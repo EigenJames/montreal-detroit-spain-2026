@@ -1851,7 +1851,7 @@
           const source = String(valueAt(row, ['憑證來源'])).trim();
           const note = String(valueAt(row, ['備註'])).trim();
           const evidenceStatus = valueAt(row, ['憑證狀態']);
-          const reportStatus = valueAt(row, ['報帳判定', '申報狀態']);
+          const reportStatus = valueAt(row, ['報帳判定', '報帳狀態', '申報狀態']);
           const original = parseTrackerAmount(valueAt(row, ['原幣金額']));
           const twd = parseTrackerAmount(valueAt(row, ['台幣入帳金額', '台幣金額']));
           const currency = String(valueAt(row, ['幣別'])).trim().toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3) || 'TWD';
