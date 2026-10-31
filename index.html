@@ -312,6 +312,7 @@
     .field input, .field select { width: 100%; min-height: 40px; padding: 8px 10px; color: var(--ink); background: #fff; border: 1px solid #bfcbd8; border-radius: 8px; font-size: 12px; }
     .expense-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin: 0 0 12px; }
     .expense-toolbar-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tracker-import-note { margin: -2px 0 16px; color: var(--muted); font-size: 11px; line-height: 1.55; }
     .backup-paste { margin: 0 0 16px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #f8fafc; color: #52657d; font-size: 12px; }
     .backup-paste summary { cursor: pointer; font-weight: 800; color: var(--ink); }
     .backup-paste p { margin: 8px 0; }
@@ -336,10 +337,11 @@
     .folder-picker span { margin-top: 3px; color: var(--muted); font-size: 10px; }
     .folder-picker input { position: absolute; width: 1px; height: 1px; opacity: 0; }
     .file-list { margin: 0; padding: 0; list-style: none; }
-    .file-list li { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 9px 0; border-bottom: 1px solid #e8edf2; font-size: 11px; }
+    .file-list li { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 9px 0; border-bottom: 1px solid #e8edf2; font-size: 11px; }
     .file-list li:last-child { border-bottom: 0; }
     .file-list span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .file-list small { color: var(--green); font-weight: 800; }
+    .file-list input { width: 15px; height: 15px; margin: 0; accent-color: var(--blue); }
     .file-empty { color: var(--muted); font-size: 11px; }
     .report-includes { margin: 12px 0 16px; padding-left: 18px; color: #465a73; font-size: 11px; }
     .report-includes li + li { margin-top: 6px; }
@@ -359,7 +361,8 @@
     .report-summary span { display: block; font-size: 8px; text-transform: uppercase; }
     .report-summary strong { display: block; margin-top: 4px; font-size: 15px; }
     .evidence-sheet { break-before: page; padding-top: 10px; }
-    .evidence-item { break-inside: avoid; margin: 0 0 18px; }
+    .evidence-item { break-before: page; break-inside: avoid; margin: 0 0 18px; }
+    .evidence-item:first-child { break-before: avoid; }
     .evidence-item h3 { margin: 0 0 7px; font-size: 11px; }
     .evidence-item img { display: block; max-width: 100%; max-height: 860px; margin: 0 auto; object-fit: contain; }
     .evidence-placeholder { padding: 30px; color: #555; border: 1px solid #aaa; text-align: center; font-size: 10px; }
@@ -747,11 +750,14 @@
               <h3>Expense register</h3>
               <div class="expense-toolbar-actions">
                 <button class="button primary" id="addExpenseButton" type="button">+ Add expense</button>
+                <button class="button" id="importTrackerButton" type="button">Import reimbursement tracker</button>
+                <input id="importTrackerInput" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
                 <button class="button" id="importBackupButton" type="button">Import backup</button>
                 <input id="importBackupInput" type="file" accept="application/json,.json" hidden>
                 <button class="button" id="downloadBackupButton" type="button">Download backup</button>
               </div>
             </div>
+            <p class="tracker-import-note">Import a reimbursement tracker Excel file with a <strong>費用明細</strong> sheet. It replaces the current expense register, reads only in this browser, and is never uploaded to GitHub.</p>
             <details class="backup-paste">
               <summary>Paste backup JSON (if file import is unavailable)</summary>
               <p>Use only on your own device. The text is saved only in this browser’s private workspace and is never published to GitHub.</p>
@@ -796,7 +802,7 @@
             <section class="panel report-card" id="report-preview">
               <h3>Admin report</h3>
               <p class="small-muted">The generated PDF will include:</p>
-              <ul class="report-includes"><li>TWD summary</li><li>Foreign-currency reconciliation</li><li>Expense lines</li><li>Telecom allocation</li><li>Numbered evidence appendix</li></ul>
+              <ul class="report-includes"><li>TWD summary</li><li>Foreign-currency reconciliation</li><li>Expense lines</li><li>Telecom allocation</li><li>Complete selected receipts and statement pages</li></ul>
               <button class="button primary" id="previewReportButton" type="button">Preview / print report</button>
               <div class="template-note">Based on your Taiwan Office reimbursement example. Sensitive details are never added to the public itinerary HTML.</div>
             </section>
@@ -821,6 +827,7 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+  <script src="vendor/jszip.min.js"></script>
   <script>
     (() => {
       /*
@@ -865,6 +872,8 @@
         "ASME DRIVN conference and business meetings": "ASME DRIVN 大會與商務會議",
         "Expense register": "費用明細",
         "+ Add expense": "＋ 新增費用",
+        "Import reimbursement tracker": "匯入核銷追蹤 Excel",
+        "Import a reimbursement tracker Excel file with a 費用明細 sheet. It replaces the current expense register, reads only in this browser, and is never uploaded to GitHub.": "匯入含有「費用明細」工作表的核銷追蹤 Excel。匯入後會取代目前費用明細；檔案只在此瀏覽器讀取，不會上傳到 GitHub。",
         "Import backup": "匯入備份",
         "Download backup": "下載備份",
         "Paste backup JSON (if file import is unavailable)": "貼上備份 JSON（檔案匯入無法使用時）",
@@ -910,6 +919,7 @@
         "Expense lines": "費用明細",
         "Telecom allocation": "電信費用分攤",
         "Numbered evidence appendix": "編號憑證附錄",
+        "Complete selected receipts and statement pages": "勾選的完整收據與對帳單頁面",
         "Preview / print report": "預覽／列印報表",
         "Based on your Taiwan Office reimbursement example. Sensitive details are never added to the public itinerary HTML.": "依據您的台灣辦公室報帳範例。敏感資料絕不會加入公開的行程 HTML。",
         "Edit the trip name, dates and purpose for the next destination.": "請為下一個目的地編輯旅程名稱、日期與出差目的。",
@@ -917,6 +927,11 @@
         "Private draft saved on this device.": "私人草稿已儲存在此裝置。",
         "Backup imported into the private workspace.": "備份已匯入私人工作區。",
         "This backup file is not valid.": "這個備份檔案格式無效。",
+        "The reimbursement tracker must contain a 費用明細 sheet with the expected columns.": "核銷追蹤 Excel 必須包含「費用明細」工作表及預期欄位。",
+        "Importing will replace the current expense register. Continue?": "匯入將取代目前的費用明細。是否繼續？",
+        "Preparing the report with selected evidence pages…": "正在準備含勾選憑證頁面的報表…",
+        "Unable to prepare this report. Check that the selected receipt files can be opened, then try again.": "無法準備此報表。請確認所選憑證檔案可開啟後再試一次。",
+        "PDF could not be rendered. Attach the original file separately.": "無法轉出此 PDF 頁面；請另附原始檔案。",
         "Business Trip Reimbursement": "商務旅行費用報帳",
         "1. TWD claim summary": "1. TWD 申請摘要",
         "2. Foreign-currency reconciliation": "2. 外幣核對",
@@ -1494,6 +1509,8 @@
       let expenses = [];
       let receiptFiles = [];
       let receiptUrls = [];
+      let selectedReceiptKeys = new Set();
+      let pdfJsPromise;
 
       const planModeButton = document.getElementById('planModeButton');
       const closeoutModeButton = document.getElementById('closeoutModeButton');
@@ -1534,6 +1551,10 @@
 
       const safeNumber = value => Number.isFinite(Number(value)) ? Number(value) : 0;
       const hasAmount = value => value !== '' && value !== null && value !== undefined && Number.isFinite(Number(value));
+      const receiptKey = (file, index) => `${index}:${file.webkitRelativePath || file.name}:${file.size}:${file.lastModified}`;
+      const selectedReceiptEntries = () => receiptFiles
+        .map((file, index) => ({ file, index, key: receiptKey(file, index) }))
+        .filter(entry => selectedReceiptKeys.has(entry.key));
       const claimableExpenses = () => expenses.filter(item => item.status === 'Ready to claim' || item.status === 'Claim with paper evidence');
       const claimTotal = () => claimableExpenses().reduce((sum, item) => sum + safeNumber(item.twd) + safeNumber(item.fee), 0);
       const pendingTwdCount = () => claimableExpenses().filter(item => !hasAmount(item.twd)).length;
@@ -1567,7 +1588,8 @@
       const updateReadiness = () => {
         const detailsReady = Boolean(document.getElementById('reportAdminCode').value.trim());
         const expensesReady = claimableExpenses().length > 0 && pendingTwdCount() === 0;
-        const evidenceReady = receiptFiles.length > 0;
+        const selectedEvidenceCount = selectedReceiptEntries().length;
+        const evidenceReady = selectedEvidenceCount > 0;
         const ready = [detailsReady, expensesReady, evidenceReady].filter(Boolean).length;
         document.getElementById('readinessText').textContent = currentLanguage === 'zh-Hant' ? `3 項檢查中 ${ready} 項完成` : `${ready} of 3 checks ready`;
         document.getElementById('detailsStep').textContent = uiText(detailsReady ? 'Ready' : 'Needs admin code');
@@ -1577,7 +1599,9 @@
           : pending
             ? (currentLanguage === 'zh-Hant' ? `${claimableExpenses().length} 筆可申報 · ${pending} 筆待台幣入帳` : `${claimableExpenses().length} ready · ${pending} TWD pending`)
             : (currentLanguage === 'zh-Hant' ? `${claimableExpenses().length} 筆可申報 · ${reviewCount()} 筆待確認` : `${claimableExpenses().length} ready · ${reviewCount()} under review`);
-        document.getElementById('evidenceStep').textContent = evidenceReady ? (currentLanguage === 'zh-Hant' ? `${receiptFiles.length} 個檔案` : `${receiptFiles.length} evidence ${receiptFiles.length === 1 ? 'file' : 'files'}`) : uiText('Choose receipt folder');
+        document.getElementById('evidenceStep').textContent = evidenceReady
+          ? (currentLanguage === 'zh-Hant' ? `${selectedEvidenceCount}／${receiptFiles.length} 個檔案納入 PDF` : `${selectedEvidenceCount}/${receiptFiles.length} evidence files in PDF`)
+          : uiText('Choose receipt folder');
       };
 
       const makeInput = (value, type, index, field) => {
@@ -1733,27 +1757,209 @@
         }
       });
 
+      const xlsxElements = (node, localName) => [...node.getElementsByTagNameNS('*', localName)];
+      const xlsxDocument = xml => new DOMParser().parseFromString(xml, 'application/xml');
+      const xlsxColumnIndex = reference => {
+        const letters = String(reference || '').match(/[A-Z]+/i)?.[0] || '';
+        return [...letters.toUpperCase()].reduce((index, letter) => index * 26 + letter.charCodeAt(0) - 64, 0) - 1;
+      };
+      const normaliseTrackerText = value => String(value ?? '')
+        .replace(/\s+/g, '')
+        .replace(/[／∕]/g, '/')
+        .replace(/[（(]/g, '')
+        .replace(/[）)]/g, '')
+        .trim();
+      const parseTrackerAmount = value => {
+        if (typeof value === 'number' && Number.isFinite(value)) return value;
+        const parsed = Number(String(value ?? '').replace(/[\s,，]/g, '').replace(/[^0-9.-]/g, ''));
+        return Number.isFinite(parsed) ? parsed : '';
+      };
+      const normaliseTrackerDate = value => {
+        if (typeof value === 'number' || /^\d+(?:\.\d+)?$/.test(String(value ?? '').trim())) {
+          const serial = Number(value);
+          if (serial > 20000 && serial < 70000) return new Date(Date.UTC(1899, 11, 30) + Math.round(serial) * 86400000).toISOString().slice(0, 10);
+        }
+        const match = String(value ?? '').trim().match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})/);
+        return match ? `${match[1]}-${match[2].padStart(2, '0')}-${match[3].padStart(2, '0')}` : '';
+      };
+      const trackerCategory = value => {
+        const label = String(value ?? '');
+        if (/住宿|飯店/.test(label)) return 'Accommodation';
+        if (/交通|運輸|租車|停車|過路|油費/.test(label)) return 'Transport';
+        if (/餐|餐費/.test(label)) return 'Meals';
+        if (/電信|網路|通訊|SIM/i.test(label)) return 'Telecom';
+        if (/報名|研討會|會議|conference/i.test(label)) return 'Conference';
+        return 'Other';
+      };
+      const trackerStatus = value => {
+        const label = String(value ?? '');
+        if (/不列入|排除/.test(label)) return 'Excluded';
+        if (/可申報|可直接申報/.test(label)) return 'Ready to claim';
+        if (/申請列入|紙本/.test(label)) return 'Claim with paper evidence';
+        if (/政策|用途/.test(label)) return 'Needs policy/purpose';
+        return 'Needs evidence';
+      };
+
+      const readTrackerWorkbook = async file => {
+        if (!window.JSZip) throw new Error('Workbook reader unavailable');
+        const zip = await window.JSZip.loadAsync(file);
+        const workbookFile = zip.file('xl/workbook.xml');
+        const relationsFile = zip.file('xl/_rels/workbook.xml.rels');
+        if (!workbookFile || !relationsFile) throw new Error('Not an XLSX workbook');
+        const workbook = xlsxDocument(await workbookFile.async('string'));
+        const relations = xlsxDocument(await relationsFile.async('string'));
+        const sheet = xlsxElements(workbook, 'sheet').find(item => item.getAttribute('name') === '費用明細');
+        const relationshipId = sheet?.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id') || sheet?.getAttribute('r:id');
+        const relationship = xlsxElements(relations, 'Relationship').find(item => item.getAttribute('Id') === relationshipId);
+        const target = relationship?.getAttribute('Target');
+        if (!target) throw new Error('費用明細 sheet unavailable');
+        const sheetPath = target.startsWith('/') ? target.slice(1) : `xl/${target.replace(/^\.\//, '')}`;
+        const sheetFile = zip.file(sheetPath);
+        if (!sheetFile) throw new Error('費用明細 sheet unavailable');
+
+        const sharedStringsFile = zip.file('xl/sharedStrings.xml');
+        const sharedStrings = sharedStringsFile
+          ? xlsxElements(xlsxDocument(await sharedStringsFile.async('string')), 'si').map(item => xlsxElements(item, 't').map(text => text.textContent || '').join(''))
+          : [];
+        const sheetXml = xlsxDocument(await sheetFile.async('string'));
+        const rows = xlsxElements(sheetXml, 'row').map(row => {
+          const values = [];
+          xlsxElements(row, 'c').forEach(cell => {
+            const column = xlsxColumnIndex(cell.getAttribute('r'));
+            const type = cell.getAttribute('t');
+            const raw = xlsxElements(cell, 'v')[0]?.textContent || '';
+            const inline = xlsxElements(cell, 'is')[0];
+            values[column] = type === 's' ? (sharedStrings[Number(raw)] || '') : (type === 'inlineStr' ? xlsxElements(inline, 't').map(text => text.textContent || '').join('') : raw);
+          });
+          return values;
+        });
+        const headerIndex = rows.findIndex(row => {
+          const labels = row.map(normaliseTrackerText);
+          return labels.includes('費用編號') && labels.some(label => label === '廠商/項目' || label === '廠商項目');
+        });
+        if (headerIndex === -1) throw new Error('Tracker header unavailable');
+        const headers = rows[headerIndex].map(normaliseTrackerText);
+        const valueAt = (row, aliases) => {
+          const index = headers.findIndex(header => aliases.includes(header));
+          return index === -1 ? '' : (row[index] ?? '');
+        };
+        return rows.slice(headerIndex + 1).reduce((items, row) => {
+          const expenseId = valueAt(row, ['費用編號']);
+          const merchant = valueAt(row, ['廠商/項目', '廠商項目']);
+          if (!String(expenseId).trim() && !String(merchant).trim()) return items;
+          if (/合計|總計/.test(`${expenseId}${merchant}`)) return items;
+          const source = String(valueAt(row, ['憑證來源'])).trim();
+          const note = String(valueAt(row, ['備註'])).trim();
+          const evidenceStatus = valueAt(row, ['憑證狀態']);
+          const reportStatus = valueAt(row, ['報帳判定', '申報狀態']);
+          const original = parseTrackerAmount(valueAt(row, ['原幣金額']));
+          const twd = parseTrackerAmount(valueAt(row, ['台幣入帳金額', '台幣金額']));
+          const currency = String(valueAt(row, ['幣別'])).trim().toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3) || 'TWD';
+          items.push({
+            date: normaliseTrackerDate(valueAt(row, ['日期'])),
+            merchant: String(merchant).trim(),
+            category: trackerCategory(valueAt(row, ['類別'])),
+            currency,
+            original: original === '' ? 0 : original,
+            twd,
+            fee: 0,
+            status: trackerStatus(reportStatus || evidenceStatus),
+            evidence: [source, note].filter(Boolean).join(' · ')
+          });
+          return items;
+        }, []);
+      };
+
+      const importTrackerInput = document.getElementById('importTrackerInput');
+      document.getElementById('importTrackerButton').addEventListener('click', () => importTrackerInput.click());
+      importTrackerInput.addEventListener('change', async event => {
+        const file = event.target.files[0];
+        if (!file) return;
+        try {
+          if (expenses.length && !window.confirm(uiText('Importing will replace the current expense register. Continue?'))) return;
+          const importedExpenses = await readTrackerWorkbook(file);
+          if (!importedExpenses.length) throw new Error('No tracker expenses found');
+          expenses = importedExpenses;
+          saveCloseoutDraft();
+          renderExpenses();
+          showToast(currentLanguage === 'zh-Hant' ? `已匯入 ${expenses.length} 筆核銷明細至私人工作區。` : `Imported ${expenses.length} reimbursement entries into the private workspace.`);
+        } catch (_) {
+          showToast('The reimbursement tracker must contain a 費用明細 sheet with the expected columns.');
+        } finally {
+          event.target.value = '';
+        }
+      });
+
       document.getElementById('receiptFolder').addEventListener('change', event => {
         receiptUrls.forEach(url => URL.revokeObjectURL(url));
         receiptFiles = [...event.target.files].filter(file => /\.(pdf|jpe?g|png|webp)$/i.test(file.name));
         receiptUrls = receiptFiles.map(file => URL.createObjectURL(file));
+        selectedReceiptKeys = new Set(receiptFiles.map((file, index) => receiptKey(file, index)));
         const list = document.getElementById('fileList');
         list.replaceChildren();
         document.getElementById('fileEmpty').hidden = receiptFiles.length > 0;
-        receiptFiles.slice(0, 12).forEach((file, index) => {
+        receiptFiles.forEach((file, index) => {
           const item = document.createElement('li');
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.checked = true;
+          checkbox.setAttribute('aria-label', `${file.name} ${currentLanguage === 'zh-Hant' ? '納入行政報帳 PDF' : 'include in admin reimbursement PDF'}`);
+          checkbox.addEventListener('change', () => {
+            const key = receiptKey(file, index);
+            checkbox.checked ? selectedReceiptKeys.add(key) : selectedReceiptKeys.delete(key);
+            updateReadiness();
+          });
           const name = document.createElement('span'); name.textContent = file.webkitRelativePath || file.name;
-          const status = document.createElement('small'); status.textContent = uiText('Local only');
-          item.append(name, status); list.appendChild(item);
+          const status = document.createElement('small'); status.textContent = currentLanguage === 'zh-Hant' ? '納入 PDF · 僅限本機' : 'Include in PDF · local only';
+          item.append(checkbox, name, status); list.appendChild(item);
         });
-        if (receiptFiles.length > 12) {
-          const item = document.createElement('li'); item.textContent = currentLanguage === 'zh-Hant' ? `另有 ${receiptFiles.length - 12} 個檔案` : `+ ${receiptFiles.length - 12} more files`; list.appendChild(item);
-        }
         updateReadiness();
       });
 
       const addTextCell = (row, value) => { const cell = document.createElement('td'); cell.textContent = value; row.appendChild(cell); };
-      const buildAdminReport = () => {
+      const loadPdfJs = () => {
+        if (!pdfJsPromise) {
+          pdfJsPromise = import('./vendor/pdfjs/pdf.min.mjs').then(pdfjsLib => {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('vendor/pdfjs/pdf.worker.min.mjs', document.baseURI).href;
+            return pdfjsLib;
+          });
+        }
+        return pdfJsPromise;
+      };
+      const appendImageEvidence = (container, entry) => {
+        const item = document.createElement('article'); item.className = 'evidence-item';
+        const heading = document.createElement('h3'); heading.textContent = `${entry.index + 1}. ${entry.file.webkitRelativePath || entry.file.name}`;
+        const image = document.createElement('img'); image.src = receiptUrls[entry.index]; image.alt = entry.file.name;
+        item.append(heading, image); container.appendChild(item);
+      };
+      const appendPdfEvidence = async (container, entry) => {
+        let pdf;
+        try {
+          const pdfjsLib = await loadPdfJs();
+          pdf = await pdfjsLib.getDocument({ data: new Uint8Array(await entry.file.arrayBuffer()) }).promise;
+          for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+            const page = await pdf.getPage(pageNumber);
+            const viewport = page.getViewport({ scale: 1.55 });
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.ceil(viewport.width); canvas.height = Math.ceil(viewport.height);
+            await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+            const item = document.createElement('article'); item.className = 'evidence-item';
+            const heading = document.createElement('h3');
+            heading.textContent = `${entry.index + 1}. ${entry.file.webkitRelativePath || entry.file.name} · PDF ${pageNumber}/${pdf.numPages}`;
+            const image = document.createElement('img'); image.src = canvas.toDataURL('image/jpeg', .9); image.alt = `${entry.file.name} page ${pageNumber}`;
+            item.append(heading, image); container.appendChild(item);
+            canvas.width = 1; canvas.height = 1;
+          }
+        } catch (_) {
+          const item = document.createElement('article'); item.className = 'evidence-item';
+          const heading = document.createElement('h3'); heading.textContent = `${entry.index + 1}. ${entry.file.webkitRelativePath || entry.file.name}`;
+          const placeholder = document.createElement('div'); placeholder.className = 'evidence-placeholder'; placeholder.textContent = uiText('PDF could not be rendered. Attach the original file separately.');
+          item.append(heading, placeholder); container.appendChild(item);
+        } finally {
+          await pdf?.destroy?.();
+        }
+      };
+      const buildAdminReport = async () => {
         const tripName = document.getElementById('reportTripName').value || 'Business trip';
         const dates = document.getElementById('reportDates').value;
         const traveler = document.getElementById('reportTraveler').value;
@@ -1793,24 +1999,37 @@
         if (!telecom.length) { const row = document.createElement('tr'); const cell = document.createElement('td'); cell.colSpan = 5; cell.textContent = uiText('No telecom allocation entered.'); row.appendChild(cell); telecomRows.appendChild(row); }
 
         const evidence = document.getElementById('printEvidence'); evidence.replaceChildren();
-        if (!receiptFiles.length) {
+        const selectedEvidence = selectedReceiptEntries();
+        if (!selectedEvidence.length) {
           const placeholder = document.createElement('div'); placeholder.className = 'evidence-placeholder'; placeholder.textContent = uiText('No evidence files selected. Attach numbered receipts and statements before submission.'); evidence.appendChild(placeholder);
         } else {
-          receiptFiles.forEach((file, index) => {
-            const item = document.createElement('article'); item.className = 'evidence-item';
-            const heading = document.createElement('h3'); heading.textContent = `${index + 1}. ${file.webkitRelativePath || file.name}`; item.appendChild(heading);
-            if (/^image\//.test(file.type)) { const image = document.createElement('img'); image.src = receiptUrls[index]; image.alt = file.name; item.appendChild(image); }
-            else { const placeholder = document.createElement('div'); placeholder.className = 'evidence-placeholder'; placeholder.textContent = `PDF evidence: ${file.name}`; item.appendChild(placeholder); }
-            evidence.appendChild(item);
-          });
+          for (const entry of selectedEvidence) {
+            if (/\.pdf$/i.test(entry.file.name) || entry.file.type === 'application/pdf') await appendPdfEvidence(evidence, entry);
+            else appendImageEvidence(evidence, entry);
+          }
         }
       };
 
-      const printAdminReport = () => {
-        buildAdminReport();
+      let reportPreparing = false;
+      const printAdminReport = async () => {
+        if (reportPreparing) return;
+        reportPreparing = true;
+        const buttons = [document.getElementById('previewReportButton'), document.getElementById('generateReportButton')];
+        buttons.forEach(button => { button.disabled = true; button.dataset.label = button.textContent; button.textContent = uiText('Preparing the report with selected evidence pages…'); });
         document.getElementById('adminReport').setAttribute('aria-hidden', 'false');
         document.body.classList.add('printing-report');
-        setTimeout(() => window.print(), 120);
+        try {
+          await buildAdminReport();
+          await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+          window.print();
+        } catch (_) {
+          document.body.classList.remove('printing-report');
+          document.getElementById('adminReport').setAttribute('aria-hidden', 'true');
+          showToast('Unable to prepare this report. Check that the selected receipt files can be opened, then try again.');
+        } finally {
+          reportPreparing = false;
+          buttons.forEach(button => { button.disabled = false; button.textContent = button.dataset.label || button.textContent; });
+        }
       };
       document.getElementById('previewReportButton').addEventListener('click', printAdminReport);
       document.getElementById('generateReportButton').addEventListener('click', printAdminReport);
