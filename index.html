@@ -343,6 +343,10 @@
     .file-list small { color: var(--green); font-weight: 800; }
     .file-list input { width: 15px; height: 15px; margin: 0; accent-color: var(--blue); }
     .file-empty { color: var(--muted); font-size: 11px; }
+    .receipt-password { display: grid; gap: 5px; margin: 12px 0; }
+    .receipt-password label { color: #52657d; font-size: 10px; font-weight: 850; letter-spacing: .05em; text-transform: uppercase; }
+    .receipt-password input { width: 100%; min-height: 38px; padding: 8px 10px; color: var(--ink); background: #fff; border: 1px solid #bfcbd8; border-radius: 8px; font-size: 12px; }
+    .receipt-password small { color: var(--muted); font-size: 10px; line-height: 1.45; }
     .report-includes { margin: 12px 0 16px; padding-left: 18px; color: #465a73; font-size: 11px; }
     .report-includes li + li { margin-top: 6px; }
     .template-note { margin-top: 11px; color: var(--muted); font-size: 10px; }
@@ -795,6 +799,11 @@
                 <strong>Choose receipt folder</strong><span>PDF, JPG, PNG · processed locally</span>
                 <input id="receiptFolder" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" multiple webkitdirectory>
               </label>
+              <div class="receipt-password">
+                <label for="receiptPdfPassword">PDF password (if needed)</label>
+                <input id="receiptPdfPassword" type="password" autocomplete="off" placeholder="Used only to render protected PDFs; never saved or printed">
+                <small>Leave blank for normal PDFs. This field remains only in memory for the current session.</small>
+              </div>
               <p class="file-empty" id="fileEmpty">No receipt files selected. Your browser will ask permission each time you reopen the page.</p>
               <ul class="file-list" id="fileList"></ul>
             </section>
@@ -910,6 +919,9 @@
         "Claim total": "申請總額",
         "Evidence folder": "憑證資料夾",
         "PDF, JPG, PNG · processed locally": "PDF、JPG、PNG · 僅在本機處理",
+        "PDF password (if needed)": "PDF 密碼（如需要）",
+        "Used only to render protected PDFs; never saved or printed": "僅用於轉出受保護的 PDF；不會儲存或列印",
+        "Leave blank for normal PDFs. This field remains only in memory for the current session.": "一般 PDF 請留白。此欄位只會保留在本次工作階段的記憶體中。",
         "Local only": "僅限本機",
         "No receipt files selected. Your browser will ask permission each time you reopen the page.": "尚未選擇收據檔案。每次重新開啟頁面時，瀏覽器都會再次詢問存取權限。",
         "Admin report": "行政報帳報表",
@@ -1936,7 +1948,8 @@
         let pdf;
         try {
           const pdfjsLib = await loadPdfJs();
-          pdf = await pdfjsLib.getDocument({ data: new Uint8Array(await entry.file.arrayBuffer()) }).promise;
+          const password = document.getElementById('receiptPdfPassword').value;
+          pdf = await pdfjsLib.getDocument({ data: new Uint8Array(await entry.file.arrayBuffer()), password }).promise;
           for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
             const page = await pdf.getPage(pageNumber);
             const viewport = page.getViewport({ scale: 1.55 });
